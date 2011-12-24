@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="28cm" height="14cm" viewBox="80 85 545 278" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="340" y="180" width="40" height="80"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="340" y="180" width="40" height="80"/>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="340" y1="220" x2="300" y2="220"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="380" y1="220" x2="420" y2="220"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="360" y1="260" x2="360" y2="280"/>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="360" y1="280" x2="360" y2="300"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="340" y1="300" x2="380" y2="300"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="346.7" y1="310" x2="373.3" y2="310"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="353.4" y1="320" x2="366.6" y2="320"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="300" y1="120" x2="279.13" y2="120"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 6; stroke: #000000" x1="279.13" y1="100" x2="279.13" y2="140"/>
+    <polygon style="fill: #ffffff" points="279.13,120 260.87,100 260.87,140 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="279.13,120 260.87,100 260.87,140 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="260.87" y1="120" x2="240" y2="120"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="140" y1="120" x2="165" y2="120"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="165" y1="110" x2="165" y2="130"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="175" y1="100" x2="175" y2="140"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="180" y1="110" x2="190" y2="110"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="185" y1="115" x2="185" y2="105"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="175" y1="120" x2="200" y2="120"/>
+  </g>
+  <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="240,160 240,178 220,180 260,184 220,188 260,192 220,196 260,200 240,202 240,220 "/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="240" y1="160" x2="240" y2="120"/>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="240" y1="220" x2="240" y2="240"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="220" y1="240" x2="260" y2="240"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="226.7" y1="250" x2="253.3" y2="250"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="233.4" y1="260" x2="246.6" y2="260"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="260" y1="340" x2="239.13" y2="340"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 6; stroke: #000000" x1="239.13" y1="320" x2="239.13" y2="360"/>
+    <polygon style="fill: #ffffff" points="239.13,340 220.87,320 220.87,360 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="239.13,340 220.87,320 220.87,360 "/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="220.87" y1="340" x2="200" y2="340"/>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="300" y1="120" x2="300" y2="340"/>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="100" y1="200" x2="100" y2="220"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="80" y1="220" x2="120" y2="220"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="86.7" y1="230" x2="113.3" y2="230"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="93.4" y1="240" x2="106.6" y2="240"/>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="100" y1="120" x2="100" y2="200"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="100" y1="120" x2="140" y2="120"/>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="353" y="198">
+    <tspan x="353" y="198">VR</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="313" y="211">
+    <tspan x="313" y="211">Vin</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="474" y="215">
+    <tspan x="474" y="215">Vcc</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="200" y="200">
+    <tspan x="200" y="200">R</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="460" y="300">
+    <tspan x="460" y="300">Vin = battery or USB (5V)</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="460" y="340">
+    <tspan x="460" y="340">R = 1 MOhm</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="460" y="320">
+    <tspan x="460" y="320">Vcc = 3.3 V</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="140" y="360">
+    <tspan x="140" y="360">V_USB</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="108" y="97">
+    <tspan x="108" y="97">Battery 4.5 - 3V</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="420" y1="220" x2="420" y2="244"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="400" y1="244" x2="440" y2="244"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="400" y1="256" x2="440" y2="256"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="420" y1="256" x2="420" y2="280"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="420" y1="280" x2="420" y2="300"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="400" y1="300" x2="440" y2="300"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="406.7" y1="310" x2="433.3" y2="310"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="413.4" y1="320" x2="426.6" y2="320"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="420" y1="220" x2="487.764" y2="220"/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="487.764,225 497.764,220 487.764,215 "/>
+  </g>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="446" y="254">
+    <tspan x="446" y="254">C</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="460" y="360">
+    <tspan x="460" y="360">C = 10 uF</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="200" y1="120" x2="212" y2="120"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="240,120 228,120 212,128 "/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="220" y="116">
+      <tspan x="220" y="116"></tspan>
+    </text>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="260" y1="340" x2="300" y2="340"/>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="200" y1="340" x2="151" y2="340"/>
+    <path style="fill: #ffffff" d="M 141 340 C 141,337.5 143.5,335 146,335 C 148.5,335 151,337.5 151,340 C 151,342.5 148.5,345 146,345 C 143.5,345 141,342.5 141,340z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 141 340 C 141,337.5 143.5,335 146,335 C 148.5,335 151,337.5 151,340 C 151,342.5 148.5,345 146,345 C 143.5,345 141,342.5 141,340"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="120" y="160" width="80" height="20"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="120" y="160" width="80" height="20"/>
+  </g>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="135" y="175">
+    <tspan x="135" y="175">Bat Mon</tspan>
+  </text>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="120" y1="160" x2="120" y2="120"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="200" y1="160" x2="200" y2="120"/>
+</svg>

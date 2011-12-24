@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="21cm" height="12cm" viewBox="360 179 420 223" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="480" y="180" width="140" height="220"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="480" y="180" width="140" height="220"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="260" x2="687.764" y2="260"/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="687.764,265 697.764,260 687.764,255 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="240" x2="689" y2="240"/>
+    <path style="fill: #ffffff" d="M 699 240 C 699,242.5 696.5,245 694,245 C 691.5,245 689,242.5 689,240 C 689,237.5 691.5,235 694,235 C 696.5,235 699,237.5 699,240z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699 240 C 699,242.5 696.5,245 694,245 C 691.5,245 689,242.5 689,240 C 689,237.5 691.5,235 694,235 C 696.5,235 699,237.5 699,240"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="220" x2="689" y2="220"/>
+    <path style="fill: #ffffff" d="M 699 220 C 699,222.5 696.5,225 694,225 C 691.5,225 689,222.5 689,220 C 689,217.5 691.5,215 694,215 C 696.5,215 699,217.5 699,220z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699 220 C 699,222.5 696.5,225 694,225 C 691.5,225 689,222.5 689,220 C 689,217.5 691.5,215 694,215 C 696.5,215 699,217.5 699,220"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="280" x2="689" y2="280"/>
+    <path style="fill: #ffffff" d="M 699 280 C 699,282.5 696.5,285 694,285 C 691.5,285 689,282.5 689,280 C 689,277.5 691.5,275 694,275 C 696.5,275 699,277.5 699,280z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699 280 C 699,282.5 696.5,285 694,285 C 691.5,285 689,282.5 689,280 C 689,277.5 691.5,275 694,275 C 696.5,275 699,277.5 699,280"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="300" x2="689" y2="300"/>
+    <path style="fill: #ffffff" d="M 699 300 C 699,302.5 696.5,305 694,305 C 691.5,305 689,302.5 689,300 C 689,297.5 691.5,295 694,295 C 696.5,295 699,297.5 699,300z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699 300 C 699,302.5 696.5,305 694,305 C 691.5,305 689,302.5 689,300 C 689,297.5 691.5,295 694,295 C 696.5,295 699,297.5 699,300"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="320" x2="689" y2="320"/>
+    <path style="fill: #ffffff" d="M 699 320 C 699,322.5 696.5,325 694,325 C 691.5,325 689,322.5 689,320 C 689,317.5 691.5,315 694,315 C 696.5,315 699,317.5 699,320z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699 320 C 699,322.5 696.5,325 694,325 C 691.5,325 689,322.5 689,320 C 689,317.5 691.5,315 694,315 C 696.5,315 699,317.5 699,320"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="340" x2="689" y2="340"/>
+    <path style="fill: #ffffff" d="M 699 340 C 699,342.5 696.5,345 694,345 C 691.5,345 689,342.5 689,340 C 689,337.5 691.5,335 694,335 C 696.5,335 699,337.5 699,340z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699 340 C 699,342.5 696.5,345 694,345 C 691.5,345 689,342.5 689,340 C 689,337.5 691.5,335 694,335 C 696.5,335 699,337.5 699,340"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="360" x2="689" y2="360"/>
+    <path style="fill: #ffffff" d="M 699 360 C 699,362.5 696.5,365 694,365 C 691.5,365 689,362.5 689,360 C 689,357.5 691.5,355 694,355 C 696.5,355 699,357.5 699,360z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699 360 C 699,362.5 696.5,365 694,365 C 691.5,365 689,362.5 689,360 C 689,357.5 691.5,355 694,355 C 696.5,355 699,357.5 699,360"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="380" x2="689" y2="380"/>
+    <path style="fill: #ffffff" d="M 699 380 C 699,382.5 696.5,385 694,385 C 691.5,385 689,382.5 689,380 C 689,377.5 691.5,375 694,375 C 696.5,375 699,377.5 699,380z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699 380 C 699,382.5 696.5,385 694,385 C 691.5,385 689,382.5 689,380 C 689,377.5 691.5,375 694,375 C 696.5,375 699,377.5 699,380"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="200" x2="412.236" y2="200"/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="412.236,195 402.236,200 412.236,205 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="380" x2="411" y2="380"/>
+    <path style="fill: #ffffff" d="M 401 380 C 401,377.5 403.5,375 406,375 C 408.5,375 411,377.5 411,380 C 411,382.5 408.5,385 406,385 C 403.5,385 401,382.5 401,380z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 380 C 401,377.5 403.5,375 406,375 C 408.5,375 411,377.5 411,380 C 411,382.5 408.5,385 406,385 C 403.5,385 401,382.5 401,380"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="360" x2="411" y2="360"/>
+    <path style="fill: #ffffff" d="M 401 360 C 401,357.5 403.5,355 406,355 C 408.5,355 411,357.5 411,360 C 411,362.5 408.5,365 406,365 C 403.5,365 401,362.5 401,360z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 360 C 401,357.5 403.5,355 406,355 C 408.5,355 411,357.5 411,360 C 411,362.5 408.5,365 406,365 C 403.5,365 401,362.5 401,360"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="340" x2="411" y2="340"/>
+    <path style="fill: #ffffff" d="M 401 340 C 401,337.5 403.5,335 406,335 C 408.5,335 411,337.5 411,340 C 411,342.5 408.5,345 406,345 C 403.5,345 401,342.5 401,340z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 340 C 401,337.5 403.5,335 406,335 C 408.5,335 411,337.5 411,340 C 411,342.5 408.5,345 406,345 C 403.5,345 401,342.5 401,340"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="320" x2="411" y2="320"/>
+    <path style="fill: #ffffff" d="M 401 320 C 401,317.5 403.5,315 406,315 C 408.5,315 411,317.5 411,320 C 411,322.5 408.5,325 406,325 C 403.5,325 401,322.5 401,320z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 320 C 401,317.5 403.5,315 406,315 C 408.5,315 411,317.5 411,320 C 411,322.5 408.5,325 406,325 C 403.5,325 401,322.5 401,320"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="300" x2="411" y2="300"/>
+    <path style="fill: #ffffff" d="M 401 300 C 401,297.5 403.5,295 406,295 C 408.5,295 411,297.5 411,300 C 411,302.5 408.5,305 406,305 C 403.5,305 401,302.5 401,300z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 300 C 401,297.5 403.5,295 406,295 C 408.5,295 411,297.5 411,300 C 411,302.5 408.5,305 406,305 C 403.5,305 401,302.5 401,300"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="280" x2="411" y2="280"/>
+    <path style="fill: #ffffff" d="M 401 280 C 401,277.5 403.5,275 406,275 C 408.5,275 411,277.5 411,280 C 411,282.5 408.5,285 406,285 C 403.5,285 401,282.5 401,280z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 280 C 401,277.5 403.5,275 406,275 C 408.5,275 411,277.5 411,280 C 411,282.5 408.5,285 406,285 C 403.5,285 401,282.5 401,280"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="260" x2="411" y2="260"/>
+    <path style="fill: #ffffff" d="M 401 260 C 401,257.5 403.5,255 406,255 C 408.5,255 411,257.5 411,260 C 411,262.5 408.5,265 406,265 C 403.5,265 401,262.5 401,260z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 260 C 401,257.5 403.5,255 406,255 C 408.5,255 411,257.5 411,260 C 411,262.5 408.5,265 406,265 C 403.5,265 401,262.5 401,260"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="240" x2="411" y2="240"/>
+    <path style="fill: #ffffff" d="M 401 240 C 401,237.5 403.5,235 406,235 C 408.5,235 411,237.5 411,240 C 411,242.5 408.5,245 406,245 C 403.5,245 401,242.5 401,240z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 240 C 401,237.5 403.5,235 406,235 C 408.5,235 411,237.5 411,240 C 411,242.5 408.5,245 406,245 C 403.5,245 401,242.5 401,240"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="480" y1="220" x2="411" y2="220"/>
+    <path style="fill: #ffffff" d="M 401 220 C 401,217.5 403.5,215 406,215 C 408.5,215 411,217.5 411,220 C 411,222.5 408.5,225 406,225 C 403.5,225 401,222.5 401,220z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 401 220 C 401,217.5 403.5,215 406,215 C 408.5,215 411,217.5 411,220 C 411,222.5 408.5,225 406,225 C 403.5,225 401,222.5 401,220"/>
+  </g>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="500" y="200">
+    <tspan x="500" y="200">1</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="500" y="380">
+    <tspan x="500" y="380">10</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="600" y="200">
+    <tspan x="600" y="200">20</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="200">
+    <tspan x="360" y="200">Vcc</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="760" y1="200" x2="760" y2="220"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="740" y1="220" x2="780" y2="220"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="746.7" y1="230" x2="773.3" y2="230"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="753.4" y1="240" x2="766.6" y2="240"/>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="620" y1="200" x2="760" y2="200"/>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="220">
+    <tspan x="360" y="220">LED0</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="240">
+    <tspan x="360" y="240">LED1</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="260">
+    <tspan x="360" y="260">nRST</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="280">
+    <tspan x="360" y="280">LED2</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="300">
+    <tspan x="360" y="300">LED3</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="320">
+    <tspan x="360" y="320">LED4</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="340">
+    <tspan x="360" y="340">nSS</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="360">
+    <tspan x="360" y="360">MISO</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="380">
+    <tspan x="360" y="380">Tx</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="380">
+    <tspan x="700" y="380">SCLK</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="360">
+    <tspan x="700" y="360">Rx</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="340">
+    <tspan x="700" y="340">MOSI</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="320">
+    <tspan x="700" y="320">SW1</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="300">
+    <tspan x="700" y="300">USBsense</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="280">
+    <tspan x="700" y="280">SW2</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="260">
+    <tspan x="700" y="260">V_USB</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="240">
+    <tspan x="700" y="240">D-</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="700" y="220">
+    <tspan x="700" y="220">D+</tspan>
+  </text>
+</svg>

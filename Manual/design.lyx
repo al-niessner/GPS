@@ -1,0 +1,2282 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman times
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 10
+\spacing onehalf
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 0
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 5
+\tocdepth 5
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Separated GPS Unit Design Document
+\end_layout
+
+\begin_layout Author
+Al Niessner
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FloatList figure
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FloatList table
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Overview
+\end_layout
+
+\begin_layout Standard
+The GPS design described in this document is satisfies two criteria: One,
+ the display and receiver should be separated as to make the receiver as
+ light and simple to carry as possible making the unit simpler to carry
+ and use while hiking.
+ Two, the display unit should use open protocols and open source freeing
+ it from all of proprietary nonsense that currently surrounds the one that
+ I own.
+ To these ends, I designed, with help, yet another GPS unit and made it
+ an open design and open software.
+\end_layout
+
+\begin_layout Standard
+The main design feature is quite simple.
+ Build a GPS receiver and data recorder with a USB interface and they use
+ a laptop or netbook or tablet or smart phone or some device with its own
+ power supply and nice display.
+ The receiver should operate independently of being connected to the display,
+ but the display should power the unit when connected.
+ This breaks the design into three essential parts: One, the hardware for
+ the GPS receiver and data recorder.
+ Two, the firmware used on the hardware to receive and record the data.
+ Three, the software that resides on the commercially available display
+ device.
+\end_layout
+
+\begin_layout Subsection
+Use Case
+\end_layout
+
+\begin_layout Standard
+The device is simple and offers a very simple hardware interface as shown
+ in figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Use-Case"
+
+\end_inset
+
+.
+ The device has two buttons allowing the user three functions:
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Clear
+\begin_inset space ~
+\end_inset
+
+Memory Empty the micro SD Flash memory.
+ Requires that both buttons be pushed until the user is signaled with the
+ button acceptance LED.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+Mark
+\begin_inset space ~
+\end_inset
+
+Waypoint Mark the next sample as an important waypoint.
+ Requires that the waypoint button be pused until the user is signaled with
+ the button acceptance LED.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+New
+\begin_inset space ~
+\end_inset
+
+Track Place a marker in the data that all points after the maker belong
+ to a new track.
+ Requires that the track button be pused until the user is signaled with
+ the button acceptance LED.
+\end_layout
+
+\begin_layout Standard
+The user can also connect and disconnect a high power device through a USB
+ connector.
+ When connected, power is received from the USB bus.
+ The high powered device is the fancy display that allows the user to view
+ thier location and track on maps or name the tracks and waypoints or save
+ them or configure the GPS or many other tasks.
+ The high powered device should not need to be connected at all times, however.
+ Thus the user can connect and disconnet a high powered device at will and
+ the GPS recorder will continue to operate uninterrupted.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename topUC.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Use-Case"
+
+\end_inset
+
+Use Case
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Hardware
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Hardware-Block-Diagram"
+
+\end_inset
+
+ shows the overall layout of the hardware design.
+ The idea is to use lower power parts that can accumulate the GPS data until
+ a much more sophisticated and power hungry device reads it and does something
+ useful with it.
+ Hence, the center piece of the design is the uC.
+ It is responsible for giving access to the data and GPS from the USB interface
+ as well as shuffling the GPS data to Flash memory.
+ A small number of switches and LEDs are the input and output to the user
+ during normal operation.
+\end_layout
+
+\begin_layout Standard
+The Microchip PIC18LF14K50 uC contains several modules necessary to accomplish
+ the tasks assigned to it.
+ It has a built in USB module that handles the USB protocol and data transfer.
+ It has a UART for communicating with the GPS unit.
+ It has a memory module for Flash memory.
+ Finally, it has built in IO for the switches and LEDs.
+\end_layout
+
+\begin_layout Standard
+The power source is the other key element in the block diagram.
+ The unit should have its own power when not plugged into the USB, but it
+ should use USB power when connected.
+ The power source shown in the block diagram is responsible for switching
+ between a battery pack and USB without loss of power to the rest of the
+ circuit.
+ It must also regulate this voltage to 3.3 volts.
+ While the uC will continue to operate with voltages as low as 2.7 volts,
+ the GPS has a higher threshold of 3.0 volts.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename block.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Hardware-Block-Diagram"
+
+\end_inset
+
+Hardware Block Diagram
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Power-Source"
+
+\end_inset
+
+Power Source
+\end_layout
+
+\begin_layout Standard
+The power source element of the block diagram in figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Hardware-Block-Diagram"
+
+\end_inset
+
+ has to switch between the USB and battery source as the USB is willy nilly
+ plugged in and out without loss of power to the rest of system.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Power-Source-Circuit"
+
+\end_inset
+
+ shows the complete circuit for the power source module.
+ The diodes protect the circuits from reverse bias but there is always some
+ current flow in the reverse direction.
+ The resister R between the battery and diode allow the reverse current
+ flow to be shunt to ground allowing the battery to safely discharge at
+ all times.
+ The capacitor after the voltage regulator gives the diodes time to switch
+ between the USB and battery.
+ Given the circuit will draw less than 100 mA under normal operation, the
+ capacitor C was chosen to allow about 10 
+\begin_inset Formula $\mu s$
+\end_inset
+
+ for the circuit to switch between the two diodes.
+ Both diodes are Schottky diodes, chosen for their low forward voltage drop,
+ and have nanosecond response times.
+ 
+\end_layout
+
+\begin_layout Standard
+The parts list for segment of the power supply circuit is in Table 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "tab:Power-Source-Parts"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename power.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Power-Source-Circuit"
+
+\end_inset
+
+Power Source Circuit
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+VR is a voltage regulator.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nomenclature
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Part Number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Battery
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3x AAA alkaline
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Diodes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+497-2493-1-ND
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Voltage Regulator
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Battery Monitor
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TC54VN3002EZB
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+R
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+C
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Power-Source-Parts"
+
+\end_inset
+
+Power Source Parts List
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+GPS
+\end_layout
+
+\begin_layout Standard
+The GPS is an off-the-shelf component and requires no work other than to
+ interface to it.
+ The part number is LS2003-1 and it is connected to the uC and power as
+ shown in figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:GPS-Connection"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gps.svg
+	width 50col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:GPS-Connection"
+
+\end_inset
+
+GPS Connection
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+In this diagram the signal known as Tx is connected to the input of the
+ GPS unit, and the Rx signal is connected to the output of the GPS.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+micro SD Flash
+\end_layout
+
+\begin_layout Standard
+The SD Flash is an off-the-shelf component and requires no work other than
+ to interface to it.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:microSD-Flash-Circuit"
+
+\end_inset
+
+ shows a simple non-hot-swap connection for the memory.
+ It allows the user of the device to change the memory and size it according
+ to their desire.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename sdFlash.svg
+	width 50col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:microSD-Flash-Circuit"
+
+\end_inset
+
+micro SD Flash Circuit
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+This circuit is NOT hot swap capable.
+ Need to follow the manufactures power up circuit for hot swap.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Switches and LEDs
+\end_layout
+
+\begin_layout Standard
+There are four switches and five LEDs.
+ Two of the switches feed the uC as user input and the other two have influence
+ over the circuit.
+ One of the switches is used in the power source (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Power-Source"
+
+\end_inset
+
+).
+ The discussion in this section will cover the five LEDs and three switches
+ shown in figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:User-Interface"
+
+\end_inset
+
+ whose parts are listed in table 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "tab:User-Interface-Parts"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+LEDs 0 through 3 inclusive are used to display the state of the FSM discussed
+ in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Finite-State-Machine"
+
+\end_inset
+
+.
+ Switch A is a push button switch that allows the state to be viewed.
+ This is a power saving mechanism because those LEDs are not monitored most
+ of the time.
+ LED 4 is the indicator to show that the uC has detected switch B or C or
+ both have been pressed for at least 1 second.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename ui.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:User-Interface"
+
+\end_inset
+
+User Interface
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+LED 0 through 4 inclusive as well as SW 1 and 2 map to the micro controller.
+ 
+\begin_inset Formula $R_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $R_{2}$
+\end_inset
+
+ are current limiting resistors to protect the micro controller IO pins.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nomenclature
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Part Number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LED 0-3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LN1471SYTRP
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LED 4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LNJ312G8LRA
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SW A
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D6R30 F1 LFS
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SW B
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D6R40 F1 LFS
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SW C
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+D6R10 F1 LFS
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $R_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:User-Interface-Parts"
+
+\end_inset
+
+User Interface Parts List
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+USB
+\end_layout
+
+\begin_layout Standard
+A USB-B connector is used to signal to the user that the device will be
+ using power from the connection.
+ The circuit is shown in figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:USB-Connection"
+
+\end_inset
+
+.
+ The 5V from the USB powers three different circuits.
+ The first is the uC to allow it to match its internal voltage with that
+ of the USB.
+ The second is the power supply to supply entire device.
+ The third is to drive an interrupt pin to let the controller know that
+ the USB has been connected or removed.
+ The voltage divider to reduce the USB 5V to 3.4V at the uC interrupt pin
+ was taken directly off the XuLA board
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+For more details on the XuLA board see http://www.xess.com
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename usb.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:USB-Connection"
+
+\end_inset
+
+USB Connection
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The 
+\begin_inset Formula $V_{USB}$
+\end_inset
+
+ supply goes to the uC and the power supply both.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nomenclature
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Part Number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+USB-B
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $R_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $R_{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:USB-Part-List"
+
+\end_inset
+
+USB Part List
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+uC
+\end_layout
+
+\begin_layout Standard
+The complexity of the uC is not in the circuit wiring show in figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:uC-Connections"
+
+\end_inset
+
+.
+ Instead it hides its complexity in its firmware described in detail in
+ section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Firmware"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename uC.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:uC-Connections"
+
+\end_inset
+
+uC Connections
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+All of these connections can be found in all of the previous subsections.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Power
+\end_layout
+
+\begin_layout Standard
+One of the most important parts of this device is that it is low power when
+ in normal operation.
+ Table 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "tab:Power-Consumption"
+
+\end_inset
+
+ gives a listing of each module in figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Hardware-Block-Diagram"
+
+\end_inset
+
+.
+ These are estimated values from data sheets.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Module
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $I_{Typ}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $I_{max}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power (typ)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power (max)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Power Source
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-200 mA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-1 W
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GPS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30 mA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30+ mA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+99 mW
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+99+ mW
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SD Flash
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+300 
+\begin_inset Formula $\mu A$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+100 mA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+990 
+\begin_inset Formula $\mu A$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+330 mW
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LEDs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5 mA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25 mA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16.5 mA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+82.5 mW
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Switches
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+66 
+\begin_inset Formula $\mu A$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+66 
+\begin_inset Formula $\mu A$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+218 
+\begin_inset Formula $\mu W$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+218 
+\begin_inset Formula $\mu W$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+USB
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+uC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+245 mA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+800 mW
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Power-Consumption"
+
+\end_inset
+
+Power Consumption
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The power consumption from the switches and LEDs are not a continuous load
+ but user demanded loads.The negative current and power represents that the
+ power source module is sourcing the current and power rather than consuming
+ it.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Firmware"
+
+\end_inset
+
+Firmware
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Finite-State-Machine"
+
+\end_inset
+
+Finite State Machine (FSM)
+\end_layout
+
+\begin_layout Standard
+As shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Firmware-FSM"
+
+\end_inset
+
+ a Finite State Machine (FSM) is used to describe how the micro-controller
+ interacts with the stimuli to record the GPS data and allow commands from
+ the USB.
+ The states are:
+\end_layout
+
+\begin_layout Description
+S0 Power Up State
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Turn all LEDs off
+\end_layout
+
+\begin_layout Enumerate
+Set global record boolean to False
+\end_layout
+
+\begin_layout Enumerate
+Wait for event:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+1 Hz 
+\end_layout
+
+\begin_layout Enumerate
+USB sending data 
+\end_layout
+
+\begin_layout Enumerate
+clear button pushed 
+\end_layout
+
+\begin_layout Enumerate
+track button pushed
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Description
+S1 Idle 
+\end_layout
+
+\begin_layout Enumerate
+Set global record boolean to True 
+\end_layout
+
+\begin_layout Enumerate
+Clear push buffer 
+\end_layout
+
+\begin_layout Enumerate
+Wait for event: 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+1 Hz 
+\end_layout
+
+\begin_layout Enumerate
+UART receiving data 
+\end_layout
+
+\begin_layout Enumerate
+USB sending command 
+\end_layout
+
+\begin_layout Enumerate
+track button pushed 
+\end_layout
+
+\begin_layout Enumerate
+waypoint button pushed
+\end_layout
+
+\end_deeper
+\begin_layout Description
+S2 Track 
+\end_layout
+
+\begin_layout Enumerate
+Change the state of the button LED
+\end_layout
+
+\begin_layout Enumerate
+When light is on, put $PDIYNT,,*1E<CR><LF> into push buffer
+\end_layout
+
+\begin_layout Enumerate
+Generate Always event
+\end_layout
+
+\begin_layout Description
+S3 Waypoint 
+\end_layout
+
+\begin_layout Enumerate
+Change the state of the button LED
+\end_layout
+
+\begin_layout Enumerate
+When light is on, put $PDIYWP,*2F<CR><LF> into push buffer
+\end_layout
+
+\begin_layout Enumerate
+Generate Always event
+\end_layout
+
+\begin_layout Description
+S4 UART Get character
+\end_layout
+
+\begin_layout Enumerate
+Put it into push buffer 
+\end_layout
+
+\begin_layout Enumerate
+Generate Always event
+\end_layout
+
+\begin_layout Description
+S5 USB Process command
+\end_layout
+
+\begin_layout Enumerate
+Jump to specified next state
+\end_layout
+
+\begin_layout Description
+S6 Clear button
+\end_layout
+
+\begin_layout Enumerate
+Set the button LED to on Clear memory
+\end_layout
+
+\begin_layout Enumerate
+Wait 1 second set the button LED to off
+\end_layout
+
+\begin_layout Enumerate
+Generate Always event
+\end_layout
+
+\begin_layout Description
+S7 Push message
+\end_layout
+
+\begin_layout Enumerate
+Set last to the last character in the message 
+\end_layout
+
+\begin_layout Enumerate
+Stream the message into the FLASH 
+\end_layout
+
+\begin_layout Enumerate
+Generate Always event
+\end_layout
+
+\begin_layout Description
+S8 Write to GPS
+\end_layout
+
+\begin_layout Enumerate
+Send the message string to GPS and append <CR><LF> 
+\end_layout
+
+\begin_layout Enumerate
+Generate Always event
+\end_layout
+
+\begin_layout Description
+S9 Pop message
+\end_layout
+
+\begin_layout Enumerate
+Stream data from FLASH to local memory until and including <LF> 
+\end_layout
+
+\begin_layout Enumerate
+Send message back along USB 
+\end_layout
+
+\begin_layout Enumerate
+Generate Always event
+\end_layout
+
+\begin_layout Standard
+For S8 and S9 they return to S0 or S1 depending on global record boolean.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename fsm.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Firmware-FSM"
+
+\end_inset
+
+Firmware FSM
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+On transitions, the event is always listed.
+ In multi-line transitions, the first or upper line is the event and the
+ subsequent information are the guards to the transition.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Software
+\end_layout
+
+\begin_layout Subsection
+Architecture
+\end_layout
+
+\begin_layout Standard
+The architecture is the vernerable Model-View-Controller and is shown in
+ figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Software-Architecture"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Subsystem descriptions from the bottom to top are:
+\end_layout
+
+\begin_layout Description
+bus The communications conduit amongst all of the other subsystems.
+\end_layout
+
+\begin_layout Description
+NMEA Convert standard NMEA and proprietary sentences into objects.
+ Also convert objects back into sentences.
+\end_layout
+
+\begin_layout Description
+mapfunc A library of helper functions to manipulate GPS data and maps to
+ view them.
+\end_layout
+
+\begin_layout Description
+gui The bulk of the application for viewing the GPS information and controlling
+ the hardware.
+\end_layout
+
+\begin_layout Description
+device The part of the system responsible for communicating with hardware.
+ Should isolate all aspects of that process and push received messages through
+ the bus to the other modules.
+\end_layout
+
+\begin_layout Description
+file_io The part of the system that interacts with the local file system
+ and external formats.
+\end_layout
+
+\begin_layout Description
+start Is the top level most part of the sytem that has full visibility into
+ the system.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename softArch.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Software-Architecture"
+
+\end_inset
+
+Software Architecture
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Each layer is dependent on layers below it, but not to the side or above
+ it.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Design
+\end_layout
+
+\begin_layout Standard
+The language chosen for implementing this architecture is Python.
+ There is no good reason for this choice other than I know it and it has
+ a good set of support libraries for doing what I need done.
+\end_layout
+
+\begin_layout Standard
+The architecture has been laid out into a set of Python packages and modules
+ show in figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Software-Layout"
+
+\end_inset
+
+.
+ A brief summary of each package is:
+\end_layout
+
+\begin_layout Description
+gps packages holds all of the packages and modules developed to make the
+ application.
+\end_layout
+
+\begin_layout Description
+gps.device package communicates with a GPS device.
+ It isolates the the hardware dependencies and keeps them from leaking into
+ the rest of the system by placing all of the data into a Queue to be read
+ by the rest of the system.
+\end_layout
+
+\begin_layout Description
+gps.file_io package reads and writes to the file system.
+ It isolates file access and recorded data formats from the rest of the
+ system.
+\end_layout
+
+\begin_layout Description
+gps.gui package holds all of controls, models, and views of the data the
+ user interacts with.
+ The actual controls and views are in subpackages, the model and the GUI
+ frame that holds the control and view panels is contained in this package.
+\end_layout
+
+\begin_layout Description
+gps.gui.control package holds all control panels.
+\end_layout
+
+\begin_layout Description
+gps.gui.view package holds all of the view panels.
+\end_layout
+
+\begin_layout Description
+gps.nmea package translates the NMEA sentences into Python objects making
+ them simpler to work with.
+ These objects are what the gets put into the Queue.
+\end_layout
+
+\begin_layout Description
+gps.tools package is for standalone units that depend on functionality within
+ GPS, but are not part of the architecture described here.
+\end_layout
+
+\begin_layout Description
+gps.util package hold general functions at are independent of the rest of
+ the system.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways true
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename softLayout.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Software-Layout"
+
+\end_inset
+
+Software Layout
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The pink boxes are the packages with their names in blue.
+ The names in the pink boxes are the python modules contained in the package.
+ The overall images shows the tree structure of the software architecture.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

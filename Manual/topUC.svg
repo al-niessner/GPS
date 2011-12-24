@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="18cm" height="23cm" viewBox="74 -1 358 445" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <ellipse style="fill: #ffffff" cx="100" cy="181.783" rx="6.3913" ry="6.3913"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="100" cy="181.783" rx="6.3913" ry="6.3913"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="74.4348" y1="194.565" x2="125.565" y2="194.565"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="100" y1="188.174" x2="100" y2="220.13"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="100" y1="220.13" x2="74.4348" y2="248.217"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="100" y1="220.13" x2="125.565" y2="248.217"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="100" y="272.9">
+      <tspan x="100" y="272.9">Hiker</tspan>
+    </text>
+  </g>
+  <g>
+    <ellipse style="fill: #ffffff" cx="365.45" cy="212" rx="65.45" ry="32"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="365.45" cy="212" rx="65.45" ry="32"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="365.45" y="207.9">
+      <tspan x="365.45" y="207.9">Record</tspan>
+      <tspan x="365.45" y="223.9">New Track</tspan>
+    </text>
+  </g>
+  <g>
+    <ellipse style="fill: #ffffff" cx="292.95" cy="272" rx="52.95" ry="32"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="292.95" cy="272" rx="52.95" ry="32"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="292.95" y="267.9">
+      <tspan x="292.95" y="267.9">Connect</tspan>
+      <tspan x="292.95" y="283.9">GUI</tspan>
+    </text>
+  </g>
+  <g>
+    <ellipse style="fill: #ffffff" cx="331.1" cy="352" rx="71.1" ry="32"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="331.1" cy="352" rx="71.1" ry="32"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="331.1" y="347.9">
+      <tspan x="331.1" y="347.9">Disconnect</tspan>
+      <tspan x="331.1" y="363.9">GUI</tspan>
+    </text>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="125.996" y1="219.217" x2="299.006" y2="214.002"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="125.815" y1="226.957" x2="239.001" y2="257.461"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="125.982" y1="234.84" x2="273.311" y2="318.992"/>
+  <g>
+    <ellipse style="fill: #ffffff" cx="299.95" cy="152" rx="59.95" ry="32"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="299.95" cy="152" rx="59.95" ry="32"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="299.95" y="147.9">
+      <tspan x="299.95" y="147.9">Mark</tspan>
+      <tspan x="299.95" y="163.9">Waypoint</tspan>
+    </text>
+  </g>
+  <g>
+    <ellipse style="fill: #ffffff" cx="212.1" cy="72" rx="52.1" ry="32"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="212.1" cy="72" rx="52.1" ry="32"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="212.1" y="67.9">
+      <tspan x="212.1" y="67.9">Clear</tspan>
+      <tspan x="212.1" y="83.9">Memory</tspan>
+    </text>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="125.994" y1="211.16" x2="238.997" y2="172.729"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="126.007" y1="185.665" x2="187.106" y2="104.998"/>
+  <g>
+    <ellipse style="fill: #ffffff" cx="201.725" cy="401.15" rx="61.725" ry="41.15"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="201.725" cy="401.15" rx="61.725" ry="41.15"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="201.725" y="389.05">
+      <tspan x="201.725" y="389.05">View</tspan>
+      <tspan x="201.725" y="405.05">Battery </tspan>
+      <tspan x="201.725" y="421.05">Life</tspan>
+    </text>
+  </g>
+  <g>
+    <ellipse style="fill: #ffffff" cx="354.6" cy="48" rx="74.6" ry="48"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="354.6" cy="48" rx="74.6" ry="48"/>
+    <text style="fill: #000000;text-anchor:middle;font-size:12.7998;font-family:sanserif;font-style:normal;font-weight:normal" x="354.6" y="35.9">
+      <tspan x="354.6" y="35.9">View</tspan>
+      <tspan x="354.6" y="51.9">Button</tspan>
+      <tspan x="354.6" y="67.9">Acceptance</tspan>
+    </text>
+  </g>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="125.998" y1="202.437" x2="282.092" y2="96.9839"/>
+  <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="125.99" y1="266.283" x2="178.051" y2="358.991"/>
+</svg>
