@@ -3,10 +3,11 @@
 from control import ActionsControl
 from control import ConfigurationControl
 from model import ActionModel
+from model import ConfigurationModel
 from model import ViewModel
-from view import NewDataEvent
 from view import StatusView
 
+import gps.gui
 import wx
 
 class MainDisplay(wx.Frame):
@@ -24,9 +25,11 @@ class MainDisplay(wx.Frame):
         self.sbs2 = wx.StaticBox(self.__actionPane, -1, "Actions")
         self.sbs3 = wx.StaticBox(self.__configPane, -1, "Configuration")
         self.__action = ActionsControl(self.__actionPane, -1)
-        self.__config = ConfigurationControl(self.__configPane, -1)
+        self.__config = ConfigurationControl(logger, models['config'],
+                                             self.__configPane, -1)
         self.__status = StatusView(logger, self.__statusPane, -1)
 
+        models['config'].register (self)
         models['view'].register (self)
         self.SetTitle("Main Display")
 
@@ -56,7 +59,8 @@ class MainDisplay(wx.Frame):
         return
 
     def update (self, data):
-        e = NewDataEvent (winid=self.__status.Id, data=data)
+        e = gps.gui.NewDataEvent (winid=self.__status.Id, data=data)
+        wx.PostEvent (self.__config.GetEventHandler(), e)
         wx.PostEvent (self.__status.GetEventHandler(), e)
         return
     

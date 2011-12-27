@@ -10,9 +10,140 @@ The first part that receives data from the rest of the GPS system is
 encapsulated in the ViewModel. Once the data is received and transformed,
 it is dispatched out to the view elements that are listening to it.
 """
+
+import gps.fileio.config
 import threading
 
 class ActionModel(object):
+    pass
+
+class ConfigurationModel(object):
+    def __init__ (self, bus, gps_config, logger):
+        self.__bus = bus
+        self.__gps = gps_config
+        self.__listeners = []
+        self.__lock = threading.RLock()
+        self.__logger = logger
+        self.__stop = threading.Event()
+        self.__stop.clear()
+        self.__window = gps.fileio.config.readWindow()
+        return
+
+    def __convertCompass (self, v):
+        if v is not None:
+            if type (v) is str:
+                if v == 'raw':       result = 0
+                if v == '0..360':    result = 1
+                if v == '-180..180': result = 2
+                pass
+
+            if type (v) is int:
+                if v == 0: result = 'raw'
+                if v == 1: result = '0..360'
+                if v == 2: result = '-180..180'
+                pass
+            pass
+        else: result = 0
+        return result
+    
+    def __convertConnection (self, v):
+        if v is not None:
+            if type (v) is str:
+                if v == 'disconnect': result = 0
+                if v == 'serial':     result = 1
+                if v == 'simulator':  result = 2
+                if v == 'usb':        result = 3
+                pass
+
+            if type (v) is int:
+                if v == 0: result = "disconnect"
+                if v == 1: result = "serial"
+                if v == 2: result = "simulator"
+                if v == 3: result = "usb"
+                pass
+            
+            pass
+        else: result = 0
+        return result
+    
+    def __convertTimezone (self, v):
+        if v is not None:
+            if type (v) is str:
+                if v == 'raw':   result = 0
+                if v == 'local': result = 1
+                if v == 'utc':   result = 2
+                pass
+
+            if type (v) is int:
+                if v == 0: result = 'raw'
+                if v == 1: result = 'local'
+                if v == 2: result = 'utc'
+                pass
+            pass
+        else: result = 0
+        return result
+    
+    def __convertUnits (self, v):
+        if v is not None:
+            if type (v) is str:
+                if v == 'raw':    result = 0
+                if v == 'metric': result = 1
+                if v == 'royal':  result = 2
+                pass
+
+            if type (v) is int:
+                if v == 0: result = 'raw'
+                if v == 1: result = 'metric'
+                if v == 2: result = 'royal'
+                pass
+            pass
+        else: result = 0
+        return result
+    
+    def __getState(self):
+        state = {
+            'compass':self.__gps.get ('compass', None),
+            'connection':self.__gps.get ('transport', None),
+            'devName':self.__gps.get ('serial', {}).get ('devname', None),
+            'serialRate':self.__gps.get ('serial', {}).get ('baudrate', None),
+            'sim':self.__gps.get ('simulation', None),
+            'timezone':self.__gps.get ('timezone', None),
+            'units':self.__gps.get ('units', None),
+            'usbMan':self.__gps.get ('usb', {}).get ('manufacture', None),
+            'usbPoll':self.__gps.get ('usb', {}).get ('product', None),
+            'usbProd':self.__gps.get ('usb', {}).get ('pollrate', None),
+            }
+        state['connection'] = self.__convertConnection (state['connection'])
+        return state
+
+    def set_con (self, value):
+        self.__gps['transport'] = self.__convertConnection (value)
+        gps.fileio.config.saveGPS (self.__gps)
+        return
+    
+    def set_sim (self, fn):
+        self.__gps['simulation'] = str (fn)
+        gps.fileio.config.saveGPS (self.__gps)
+        return
+    
+    def register (self, listener):
+        self.__lock.acquire()
+        self.__listeners.append (listener)
+        listener.update (self.__getState())
+        self.__lock.release()
+        return
+
+    def stop (self):
+        self.__logger.info ("View Model task is now stopping.")
+        self.__stop.set()
+        return
+    
+    def unregister (self, listener):
+        self.__lock.acquire()
+        if listener in self.__listeners: __listeners.remove (listener)
+        else: self.__logger.warning ("Listener tried to unregister that was never registered in the first place.")
+        self.__lock.release()
+        return
     pass
 
 class ViewModel(object):
@@ -166,7 +297,6 @@ class ViewModel(object):
         if listener in self.__listeners: __listeners.remove (listener)
         else: self.__logger.warning ("Listener tried to unregister that was never registered in the first place.")
         self.__lock.release()
-        return
-    
+        return    
     pass
 

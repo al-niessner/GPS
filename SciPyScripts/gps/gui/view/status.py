@@ -1,16 +1,7 @@
 #!/usr/bin/env python
 
+import gps.gui
 import wx
-
-EVT_NEW_DATA_TYPE = wx.NewEventType()
-EVT_NEW_DATA = wx.PyEventBinder (EVT_NEW_DATA_TYPE)
-
-class NewDataEvent(wx.PyEvent):
-    def __init__ (self, winid=0, et=EVT_NEW_DATA_TYPE, data={}):
-        wx.PyEvent.__init__ (self, winid, et)
-        self.data = data
-        pass
-    pass
 
 class StatusView(wx.Panel):
     def __init__(self, logger, *args, **kwds):
@@ -19,7 +10,7 @@ class StatusView(wx.Panel):
         wx.Panel.__init__(self, *args, **kwds)
 
         self.__logger = logger
-        self.Bind (EVT_NEW_DATA, self.__update)
+        self.Bind (gps.gui.EVT_NEW_DATA, self.__update)
 
         # Instantiate the elements contained in the GUI
         self.__lblToday = wx.StaticText(self, -1, "Today")

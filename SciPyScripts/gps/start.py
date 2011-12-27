@@ -2,6 +2,7 @@
 
 from device import Serial
 from device import Simulator
+from gui import ConfigurationModel
 from gui import MainDisplay
 from gui import ViewModel
 from util import Bus
@@ -47,7 +48,8 @@ def execute (config):
     import gps.start
 
     # Get a device
-    busses = { 'fromHardware':Bus(), 'toHardware':Bus() }
+    busses = { 'fromConfig':Bus(),
+               'fromHardware':Bus(), 'toHardware':Bus() }
     device = "_get" + config['transport']
     device = gps.start.__getattribute__ (device)\
              (config, busses, logging.getLogger ("gps.device"))
@@ -55,9 +57,10 @@ def execute (config):
     __makeThread (device.write, "Device Writer")
     
     # Make the models
+    ml = logging.getLogger ("gps.gui.model")
     models = {
-        'view':ViewModel (busses['fromHardware'],
-                          logging.getLogger ("gps.gui.model")),
+        'config':ConfigurationModel(busses['fromConfig'], config, ml),
+        'view':ViewModel(busses['fromHardware'], ml),
         }
     __makeThread (models['view'].run, "GUI View Model")
     
@@ -81,7 +84,7 @@ if __name__ == "__main__":
     # general output file options
     parser.add_argument ("--config-file", "-c",
                          default=os.path.join (home, ".gps.config"),
-                         help="Where to get the configuration parameters from.")
+                         help="Where to get the configuration parameters from. [%(default)s]")
     parser.add_argument ("--log-file", "-l",
                          help="The file to put log messages into.")
     parser.add_argument ("--output-dir", "-O",
@@ -102,7 +105,8 @@ if __name__ == "__main__":
 
     # get the arguments and then override the config file parameters
     args = parser.parse_args()
-    config = gps.fileio.config.readGPS (args.config_file)
+    gps.fileio.config.load (args.config_file)
+    config = gps.fileio.config.readGPS ()
     adjustConfig (args, config)
     logging.basicConfig (filename=config['file']['log'],
                          level=logging.INFO)
