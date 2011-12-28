@@ -113,19 +113,12 @@ class ConfigurationModel(object):
             'usbPoll':self.__gps.get ('usb', {}).get ('product', None),
             'usbProd':self.__gps.get ('usb', {}).get ('pollrate', None),
             }
+        state['compass'] = self.__convertCompass (state['compass'])
         state['connection'] = self.__convertConnection (state['connection'])
+        state['timezone'] = self.__convertTimezone (state['timezone'])
+        state['units'] = self.__convertUnits (state['units'])
         return state
 
-    def set_con (self, value):
-        self.__gps['transport'] = self.__convertConnection (value)
-        gps.fileio.config.saveGPS (self.__gps)
-        return
-    
-    def set_sim (self, fn):
-        self.__gps['simulation'] = str (fn)
-        gps.fileio.config.saveGPS (self.__gps)
-        return
-    
     def register (self, listener):
         self.__lock.acquire()
         self.__listeners.append (listener)
@@ -133,6 +126,40 @@ class ConfigurationModel(object):
         self.__lock.release()
         return
 
+    def set_con (self, value):
+        self.__gps['transport'] = self.__convertConnection (value)
+        gps.fileio.config.saveGPS (self.__gps)
+        return
+
+    def set_display (self, compass, tz, units):
+        self.__gps['compass'] = self.__convertCompass (compass)
+        self.__gps['timezone'] = self.__convertTimezone (tz)
+        self.__gps['units'] = self.__convertUnits (units)
+        gps.fileio.config.saveGPS (self.__gps)
+        return
+    
+    def set_serial (self, dev, rate):
+        if not 'serial' in self.__gps: self.__gps['serial'] = {}
+        
+        self.__gps['serial']['devname'] = dev
+        self.__gps['serial']['baudrate'] = rate
+        gps.fileio.config.saveGPS (self.__gps)
+        return
+    
+    def set_sim (self, fn):
+        self.__gps['simulation'] = str (fn)
+        gps.fileio.config.saveGPS (self.__gps)
+        return
+
+    def set_usb (self, man, prod, poll):
+        if not 'usb' in self.__gps: self.__gps['usb'] = {}
+        
+        self.__gps['usb']['manufacture'] = man
+        self.__gps['usb']['product'] = prod
+        self.__gps['usb']['pollrate'] = poll
+        gps.fileio.config.saveGPS (self.__gps)
+        return
+    
     def stop (self):
         self.__logger.info ("View Model task is now stopping.")
         self.__stop.set()

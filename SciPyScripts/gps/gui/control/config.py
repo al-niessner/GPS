@@ -11,7 +11,6 @@ class ConfigurationControl(wx.Panel):
         
         self.__logger = logger
         self.__model = model
-        self.Bind (gps.gui.EVT_NEW_DATA, self.__update)
         
         self.__notebook = wx.Notebook(self, -1, style=0)
         self.__device = wx.Panel(self.__notebook, -1)
@@ -29,7 +28,7 @@ class ConfigurationControl(wx.Panel):
         self._timezone = wx.RadioBox(self.__device, -1, "Time Zone",
                                      choices=["GPS Native", "Local", "UTC"],
                                      majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-        self.__lblSerialDev = wx.StaticText(self.__device, -1, "device name")
+        self.__lblSerialDev = wx.Button(self.__device, -1, "device name")
         self._devName = wx.TextCtrl(self.__device, -1, "/dev/ttyUSB0")
         self.__lblSerialRate = wx.StaticText(self.__device, -1, "rate")
         self._serialRate = wx.ComboBox(self.__device, -1,
@@ -37,7 +36,7 @@ class ConfigurationControl(wx.Panel):
                                                 "19200", "38400", "57600",
                                                 "115200"],
                                        style=wx.CB_DROPDOWN|wx.CB_DROPDOWN|wx.CB_SORT)
-        self.__lblSimulator = wx.StaticText(self.__device, -1, "file")
+        self.__lblSimulator = wx.Button(self.__device, -1, "file")
         self._sim = wx.TextCtrl(self.__device, -1, "~/sim.dat")
         self._compass = wx.RadioBox(self.__device, -1, "Heading",
                                     choices=["GPS Native",
@@ -51,7 +50,7 @@ class ConfigurationControl(wx.Panel):
         self._usbPoll = wx.SpinCtrl(self.__device, -1, "1000",
                                     min=100, max=10000)
         self.__window = wx.Panel(self.__notebook, -1)
-        self.lock = wx.Button(self, -1, "Unlock")
+        self._lock = wx.Button(self, -1, "Unlock")
 
         self.__set_properties()
         self.__do_layout()
@@ -93,7 +92,7 @@ class ConfigurationControl(wx.Panel):
         self.__notebook.AddPage (self.__device, "Device")
         self.__notebook.AddPage (self.__window, "Window")
         fgs1.Add (self.__notebook, 1, wx.EXPAND, 0)
-        fgs1.Add (self.lock, 0, wx.ALIGN_RIGHT, 0)
+        fgs1.Add (self._lock, 0, wx.ALIGN_RIGHT, 0)
         self.SetSizer (fgs1)
         fgs1.Fit (self)
         fgs1.AddGrowableRow (0)
@@ -101,10 +100,20 @@ class ConfigurationControl(wx.Panel):
         return
 
     def __register_events(self):
-        self.__file_selected = False
-        self.Bind (wx.EVT_BUTTON, self.toggle_lock)
-        self._sim.Bind (wx.EVT_SET_FOCUS, self.file_select)
-        self._sim.Bind (wx.EVT_KILL_FOCUS, self.file_select_done)
+        self.Bind (gps.gui.EVT_NEW_DATA, self.__update)
+        self.__lblSerialDev.Bind (wx.EVT_BUTTON, self.dev_select)
+        self.__lblSimulator.Bind (wx.EVT_BUTTON, self.file_select)
+        self._compass.Bind (wx.EVT_RADIOBOX, self.display)
+        self._connection.Bind (wx.EVT_RADIOBOX, self.connection)
+        self._devName.Bind (wx.EVT_TEXT, self.serial)
+        self._lock.Bind (wx.EVT_BUTTON, self.toggle_lock)
+        self._serialRate.Bind (wx.EVT_TEXT, self.serial)
+        self._sim.Bind (wx.EVT_TEXT, self.sim)
+        self._timezone.Bind (wx.EVT_RADIOBOX, self.display)
+        self._units.Bind (wx.EVT_RADIOBOX, self.display)
+        self._usbMan.Bind (wx.EVT_TEXT, self.usb)
+        self._usbProd.Bind (wx.EVT_TEXT, self.usb)
+        self._usbPoll.Bind (wx.EVT_TEXT, self.usb)
         return
     
     def __set_properties(self):
@@ -128,10 +137,11 @@ class ConfigurationControl(wx.Panel):
                 if k == 'compass' or \
                    k == 'connection' or \
                    k == 'timezone' or \
+                   k == 'units' or \
                    k == 'usb':
                     self.__getattribute__ ("_" + k).SetSelection (int(nv[k]))
                     pass
-                else: self.__getattribute__ ("_" + k).SetValue (str(nv[k]))
+                else: self.__getattribute__ ("_" + k).ChangeValue (str(nv[k]))
                 refresh = True
                 pass
             except AttributeError as ae:
@@ -145,29 +155,62 @@ class ConfigurationControl(wx.Panel):
             pass
 
         return refresh
+
+    def connection (self, event):
+        self.__model.set_con (self._connection.GetSelection())
+        return
     
-    def file_select (self, event):
-        if not self.__file_selected:
-            dlg = wx.FileDialog(self,
-                                "Choose a simulation data file",
-                                os.path.dirname (self._sim.GetValue()),
-                                os.path.basename (self._sim.GetValue()),
-                                "*.nmea",
-                                wx.OPEN)
+    def dev_select (self, event):
+        dlg = wx.FileDialog(self,
+                            "Choose a simulation data file",
+                            os.path.dirname (self._devName.GetValue()),
+                            os.path.basename (self._devName.GetValue()),
+                            "*.*",
+                            wx.OPEN)
             
-            if dlg.ShowModal() == wx.ID_OK:
-                path = dlg.GetPath()
-                self._sim.SetValue (path)
-                self.__model.set_sim (path)
-                pass
-        
-            dlg.Destroy()
-            self.__file_selected = True
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self._sim.SetValue (path)
             pass
+        
+        dlg.Destroy()
         return
 
-    def file_select_done (self, event):
-        self.__file_selected = False
+    def display (self, event):
+        self.__model.set_display (self._compass.GetSelection(),
+                                  self._timezone.GetSelection(),
+                                  self._units.GetSelection())
+        return
+    
+    def file_select (self, event):
+        dlg = wx.FileDialog(self,
+                            "Choose a simulation data file",
+                            os.path.dirname (self._sim.GetValue()),
+                            os.path.basename (self._sim.GetValue()),
+                            "*.nmea",
+                            wx.OPEN)
+            
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self._sim.SetValue (path)
+            pass
+        
+        dlg.Destroy()
+        return
+
+    def serial (self, event):
+        self.__model.set_serial (self._devName.GetValue(),
+                                 int (self._serialRate.GetValue()))
+        return
+
+    def sim (self, event):
+        self.__model.set_sim (self._sim.GetValue())
+        return
+
+    def usb (self, event):
+        self.__model.set_usb (self._usbMan.GetValue(),
+                              self._usbProd.GetValue(),
+                              self._usbPoll.GetValue())
         return
     
     def toggle_lock (self, event):
