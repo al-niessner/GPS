@@ -50,6 +50,10 @@ class ConfigurationControl(wx.Panel):
         self._usbPoll = wx.SpinCtrl(self.__device, -1, "1000",
                                     min=100, max=10000)
         self.__window = wx.Panel(self.__notebook, -1)
+        self.__assb = wx.StaticBox (self.__window, -1, "Auto Start")
+        self._autoCompass = wx.CheckBox(self.__window, -1, "Compass View")
+        self._autoMap = wx.CheckBox(self.__window, -1, "Map View")
+        self._autoStatus = wx.CheckBox(self.__window, -1, "Main View")
         self._lock = wx.Button(self, -1, "Unlock")
 
         self.__set_properties()
@@ -58,6 +62,7 @@ class ConfigurationControl(wx.Panel):
         return
 
     def __do_layout(self):
+        # do the device configuration
         fgs1 = wx.FlexGridSizer(2, 1, 5, 5)
         fgs2 = wx.FlexGridSizer(2, 2, 3, 3)
         gbs = wx.GridBagSizer (5,5)
@@ -89,6 +94,17 @@ class ConfigurationControl(wx.Panel):
         sbs3.Add (gs2, 1, wx.EXPAND, 0)
         gbs.Add (sbs3, wx.GBPosition (5,2), wx.GBSpan (3,1), wx.EXPAND)
         self.__device.SetSizer (gbs)
+        # do the window configuration
+        gs3 = wx.GridSizer (1,1,10,10)
+        gs4 = wx.GridSizer (3,1,10,10)
+        sbs4 = wx.StaticBoxSizer (self.__assb, wx.HORIZONTAL)
+        gs4.Add (self._autoCompass, flag=wx.EXPAND)
+        gs4.Add (self._autoMap, flag=wx.EXPAND)
+        gs4.Add (self._autoStatus, flag=wx.EXPAND)
+        sbs4.Add (gs4, 1, wx.EXPAND)
+        gs3.Add (sbs4, 0, wx.EXPAND)
+        self.__window.SetSizer (gs3)
+        # do the full window
         self.__notebook.AddPage (self.__device, "Device")
         self.__notebook.AddPage (self.__window, "Window")
         fgs1.Add (self.__notebook, 1, wx.EXPAND, 0)
@@ -103,6 +119,9 @@ class ConfigurationControl(wx.Panel):
         self.Bind (gps.gui.EVT_NEW_DATA, self.__update)
         self.__lblSerialDev.Bind (wx.EVT_BUTTON, self.dev_select)
         self.__lblSimulator.Bind (wx.EVT_BUTTON, self.file_select)
+        self._autoCompass.Bind (wx.EVT_CHECKBOX, self.auto)
+        self._autoMap.Bind (wx.EVT_CHECKBOX, self.auto)
+        self._autoStatus.Bind (wx.EVT_CHECKBOX, self.auto)
         self._compass.Bind (wx.EVT_RADIOBOX, self.display)
         self._connection.Bind (wx.EVT_RADIOBOX, self.connection)
         self._devName.Bind (wx.EVT_TEXT, self.serial)
@@ -141,6 +160,9 @@ class ConfigurationControl(wx.Panel):
                    k == 'usb':
                     self.__getattribute__ ("_" + k).SetSelection (int(nv[k]))
                     pass
+                elif k.startswith ("auto"):
+                    self.__getattribute__ ("_" + k).SetValue (bool(nv[k]))
+                    pass
                 else: self.__getattribute__ ("_" + k).ChangeValue (str(nv[k]))
                 refresh = True
                 pass
@@ -156,6 +178,12 @@ class ConfigurationControl(wx.Panel):
 
         return refresh
 
+    def auto (self, event):
+        self.__model.set_auto (compass=self._autoCompass.GetValue(),
+                               map=self._autoMap.GetValue(),
+                               status=self._autoStatus.GetValue())
+        return
+    
     def connection (self, event):
         self.__model.set_con (self._connection.GetSelection())
         return

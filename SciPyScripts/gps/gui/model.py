@@ -18,15 +18,15 @@ class ActionModel(object):
     pass
 
 class ConfigurationModel(object):
-    def __init__ (self, bus, gps_config, logger):
+    def __init__ (self, bus, config, logger):
         self.__bus = bus
-        self.__gps = gps_config
+        self.__gps = config['device'] if 'device' in config else {}
         self.__listeners = []
         self.__lock = threading.RLock()
         self.__logger = logger
         self.__stop = threading.Event()
         self.__stop.clear()
-        self.__window = gps.fileio.config.readWindow()
+        self.__window = config['window'] if 'window' in config else {}
         return
 
     def __convertCompass (self, v):
@@ -102,6 +102,9 @@ class ConfigurationModel(object):
     
     def __getState(self):
         state = {
+            'autoCompass':self.__window.get ('auto',{}).get ('compass', True),
+            'autoMap':self.__window.get ('auto',{}).get ('map', True),
+            'autoStatus':self.__window.get ('auto',{}).get ('status', True),
             'compass':self.__gps.get ('compass', None),
             'connection':self.__gps.get ('transport', None),
             'devName':self.__gps.get ('serial', {}).get ('devname', None),
@@ -119,6 +122,26 @@ class ConfigurationModel(object):
         state['units'] = self.__convertUnits (state['units'])
         return state
 
+    def get_pos (self, name=None):
+        result = None
+
+        if 'pos' in self.__window:
+            if name is None: result = self.__window['pos']
+            else: result = self.__window['pos'].get (name, None)
+            pass
+        
+        return result
+    
+    def get_size (self, name=None):
+        result = None
+
+        if 'size' in self.__window:
+            if name is None: result = self.__window['size']
+            else: result = self.__window['size'].get (name, None)
+            pass
+                
+        return result
+    
     def register (self, listener):
         self.__lock.acquire()
         self.__listeners.append (listener)
@@ -126,6 +149,15 @@ class ConfigurationModel(object):
         self.__lock.release()
         return
 
+    def set_auto (self, compass=None, map=None, status=None):
+        if 'auto' not in self.__window: self.__window['auto'] = {}
+        if compass is not None: self.__window['auto']['compass'] = compass
+        if map is not None:     self.__window['auto']['map'] = map
+        if status is not None:  self.__window['auto']['status'] = status
+
+        gps.fileio.config.saveWindow (self.__window)
+        return
+    
     def set_con (self, value):
         self.__gps['transport'] = self.__convertConnection (value)
         gps.fileio.config.saveGPS (self.__gps)
@@ -136,6 +168,13 @@ class ConfigurationModel(object):
         self.__gps['timezone'] = self.__convertTimezone (tz)
         self.__gps['units'] = self.__convertUnits (units)
         gps.fileio.config.saveGPS (self.__gps)
+        return
+
+    def set_position (self, name, pos):
+        if 'pos' not in self.__window: self.__window['pos'] = {}
+        
+        self.__window['pos'][name] = pos
+        gps.fileio.config.saveWindow (self.__window)
         return
     
     def set_serial (self, dev, rate):
@@ -149,6 +188,13 @@ class ConfigurationModel(object):
     def set_sim (self, fn):
         self.__gps['simulation'] = str (fn)
         gps.fileio.config.saveGPS (self.__gps)
+        return
+
+    def set_size (self, name, size):
+        if 'size' not in self.__window: self.__window['size'] = {}
+        
+        self.__window['size'][name] = size
+        gps.fileio.config.saveWindow (self.__window)
         return
 
     def set_usb (self, man, prod, poll):

@@ -3,11 +3,17 @@ def load (fn):
     """Load the config file.
     """
     global _current, _fn
-    g = {}
-    execfile (fn, g)
-    _current =  g['config']
     _fn = fn
-    return
+
+    try:
+        g = {}
+        execfile (fn, g)
+        _current = g['config']
+        pass
+    except: _current = { 'device':{'files':{}, 'serial':{}, 'usb':{}},
+                         'window':{} }
+    
+    return _current
 
 def readGPS ():
     """Read the GPS options from the loaded file.

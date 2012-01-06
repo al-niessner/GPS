@@ -15,10 +15,14 @@ class MainDisplay(wx.Frame):
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
 
-        self.__horizSplit = wx.SplitterWindow(self, -1, style=wx.SP_3D|wx.SP_BORDER)
+        self.__horizSplit = wx.SplitterWindow(self, -1,
+                                              style=wx.SP_3D|wx.SP_BORDER)
+        self.__horizSplit.SetMinimumPaneSize (10)
         self.__configPane = wx.Panel(self.__horizSplit, -1)
         self.__splitPane = wx.Panel(self.__horizSplit, -1)
-        self.__vertSplit = wx.SplitterWindow(self.__splitPane, -1, style=wx.SP_3D|wx.SP_BORDER)
+        self.__vertSplit = wx.SplitterWindow(self.__splitPane, -1,
+                                             style=wx.SP_3D|wx.SP_BORDER)
+        self.__vertSplit.SetMinimumPaneSize (10)
         self.__actionPane = wx.Panel(self.__vertSplit, -1)
         self.__statusPane = wx.Panel(self.__vertSplit, -1)
         self.sbs1 = wx.StaticBox(self.__statusPane, -1, "Status")
@@ -28,12 +32,45 @@ class MainDisplay(wx.Frame):
         self.__config = ConfigurationControl(logger, models['config'],
                                              self.__configPane, -1)
         self.__status = StatusView(logger, self.__statusPane, -1)
-
+        self.__model = models['config']
+        
         models['config'].register (self)
         models['view'].register (self)
         self.SetTitle("Main Display")
 
         self.__do_layout()
+        self.__do_config (models)
+        self.__do_events()
+        return
+
+    def __do_config (self, models):
+        if models['config'].get_pos ('main') is not None:
+            self.SetPosition (wx.Point (**models['config'].get_pos ('main')))
+            pass
+
+        if models['config'].get_pos ('main_horz') is not None:
+            pos = models['config'].get_pos ('main_horz')
+            self.__horizSplit.SetSashPosition (pos, True)
+            pass
+
+        if models['config'].get_pos ('main_vert') is not None:
+            pos = models['config'].get_pos ('main_vert')
+            self.__vertSplit.SetSashPosition (pos, True)
+            pass
+
+        if models['config'].get_size ('main') is not None:
+            self.SetSize (wx.Size (**models['config'].get_size ('main')))
+            pass
+
+        self.Layout()
+        self.Refresh()
+        return
+
+    def __do_events (self):
+        self.__horizSplit.Bind (wx.EVT_SPLITTER_SASH_POS_CHANGED, self.__horz)
+        self.__vertSplit.Bind (wx.EVT_SPLITTER_SASH_POS_CHANGED, self.__vert)
+        self.Bind (wx.EVT_SIZE, self.__resize)
+        self.Bind (wx.EVT_MOVE, self.__move)
         return
     
     def __do_layout(self):
@@ -58,6 +95,26 @@ class MainDisplay(wx.Frame):
         self.Layout()
         return
 
+    def __horz (self, e):
+        self.__model.set_position ("main_horz", e.GetSashPosition())
+        return
+
+    def __move (self, e):
+        pos = e.GetPosition()
+        self.__model.set_position ("main", {'x':pos.x, 'y':pos.y})
+        return
+
+    def __resize (self, e):
+        size = e.GetSize()
+        self.__model.set_size ("main", {'h':size.y, 'w':size.x})
+        self.Layout()
+        self.Refresh()
+        return
+
+    def __vert (self, e):
+        self.__model.set_position ("main_vert", e.GetSashPosition())
+        return
+    
     def update (self, data):
         e = gps.gui.NewDataEvent (winid=self.__status.Id, data=data)
         wx.PostEvent (self.__config.GetEventHandler(), e)
