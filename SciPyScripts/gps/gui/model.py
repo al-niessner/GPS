@@ -19,6 +19,7 @@ class ActionModel(object):
 
 class ConfigurationModel(object):
     def __init__ (self, bus, config, logger):
+        object.__init__ (self)
         self.__bus = bus
         self.__gps = config['device'] if 'device' in config else {}
         self.__listeners = []
@@ -141,6 +142,9 @@ class ConfigurationModel(object):
             pass
                 
         return result
+
+    def get_units (self):
+        return self.__convertUnits (self.__gps.get ('units', None))
     
     def register (self, listener):
         self.__lock.acquire()
@@ -371,5 +375,13 @@ class ViewModel(object):
         else: self.__logger.warning ("Listener tried to unregister that was never registered in the first place.")
         self.__lock.release()
         return    
+    pass
+
+
+class UnitModel(object):
+    def __init__ (self):
+        object.__init__ (self)
+        return
+    
     pass
 

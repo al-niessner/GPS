@@ -33,6 +33,7 @@ class MainDisplay(wx.Frame):
                                              self.__configPane, -1)
         self.__status = StatusView(logger, self.__statusPane, -1)
         self.__model = models['config']
+        self.__units = models['unit']
         
         models['config'].register (self)
         models['view'].register (self)
@@ -116,6 +117,7 @@ class MainDisplay(wx.Frame):
         return
     
     def update (self, data):
+        data = self.__unit.convert (data, self.__model.get_units())
         e = gps.gui.NewDataEvent (winid=self.__status.Id, data=data)
         wx.PostEvent (self.__config.GetEventHandler(), e)
         wx.PostEvent (self.__status.GetEventHandler(), e)
