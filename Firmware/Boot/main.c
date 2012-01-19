@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
     as published by the Free Software Foundation; either version 2
@@ -15,13 +15,13 @@
     02111-1307, USA.
 
     ©2011 - X Engineering Software Systems Corp.
-   ----------------------------------------------------------------------------------*/
+   ---------------------------------------------------------------------------*/
 
-/*----------------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
     Module Description:
     This module starts the user code or else it controls
     the programming of the flash with a new program.
-   ----------------------------------------------------------------------------------*/
+   ---------------------------------------------------------------------------*/
 
 /** I N C L U D E S **********************************************************/
 #include <p18cxxx.h>
@@ -46,37 +46,40 @@ void _low_ISR (void)
 
 #pragma code
 
+void begin_fsm(void);
+
 void main(void)
 {
-    // Initialize firmware update input pin so pullup has time to work.
-//    INIT_FMWB();
+  // Initialize firmware update input pin so pullup has time to work.
+  // INIT_FMWB();
 
-    TRISC = 0xFF & ~LED_MASK; // Outputs: LED.
+  TRISC = 0xFF & ~LED_MASK; // Outputs: LED.
 
-    // Check to see if the user-mode firmware is being updated.
-    // During boot, the uC checks EEPROM location BOOT_SELECT_FLAG_ADDR.
-    // If this location contains BOOT_INTO_USER_MODE, then the uC
-    // jumps to the user program.  If this location contains
-    // BOOT_INTO_REFLASH_MODE, then the uC initializes its USB interface
-    // and waits for packets to reprogram the part of the flash that
-    // contains the user program.  If the location contains neither code,
-    // then the uC will jump to the user program if the FMWB pin is high.
-    // Otherwise, it will jump to the code for reprogramming the flash.
-    EECON1 = 0x00;
-    EEADR  = BOOT_SELECT_FLAG_ADDR;
-    EECON1_RD = 1;
-    if( EEDATA==BOOT_INTO_USER_MODE || (EEDATA!=BOOT_INTO_REFLASH_MODE && FMWB==1) )
+  // Check to see if the user-mode firmware is being updated.
+  // During boot, the uC checks EEPROM location BOOT_SELECT_FLAG_ADDR.
+  // If this location contains BOOT_INTO_USER_MODE, then the uC
+  // jumps to the user program.  If this location contains
+  // BOOT_INTO_REFLASH_MODE, then the uC initializes its USB interface
+  // and waits for packets to reprogram the part of the flash that
+  // contains the user program.  If the location contains neither code,
+  // then the uC will jump to the user program if the FMWB pin is high.
+  // Otherwise, it will jump to the code for reprogramming the flash.
+  EECON1 = 0x00;
+  EEADR  = BOOT_SELECT_FLAG_ADDR;
+  EECON1_RD = 1;
+  if (EEDATA==BOOT_INTO_USER_MODE ||
+      (EEDATA!=BOOT_INTO_REFLASH_MODE && FMWB==1))
     { // Go into user mode.
-        _asm goto RM_RESET_VECTOR _endasm
+      _asm goto RM_RESET_VECTOR _endasm
     }
     
-    // Initiate mode to update firmware via USB.
-    mInitializeUSBDriver();     // See usbdrv.h
-    USBCheckBusStatus();        // Modified to always enable USB module
-    while(1)
+  // Initiate mode to update firmware via USB.
+  mInitializeUSBDriver();     // See usbdrv.h
+  USBCheckBusStatus();        // Modified to always enable USB module
+  while(1)
     {
-        USBDriverService();     // See usbdrv.c
-        BootService();          // See boot.c
+      USBDriverService();     // See usbdrv.c
+      BootService();          // See boot.c
     }
 }
 
@@ -89,3 +92,17 @@ rom unsigned char boot_select_flag[] = {BOOT_INTO_REFLASH_MODE};
 #pragma romdata
 
 #pragma code user = RM_RESET_VECTOR
+void reset (void)
+{
+   begin_fsm();
+}
+
+#pragma code
+void begin_fsm()
+{
+   while (1)
+   {
+      USBDriverService();     // See usbdrv.c
+      BootService();          // See boot.c
+   } 
+}

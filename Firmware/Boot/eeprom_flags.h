@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
     as published by the Free Software Foundation; either version 2
@@ -15,7 +15,7 @@
     02111-1307, USA.
 
     ©2011 - X Engineering Software Systems Corp.
-   ----------------------------------------------------------------------------------*/
+   ---------------------------------------------------------------------------*/
 
 #ifndef EEPROM_FLAGS_H
 #define EEPROM_FLAGS_H
