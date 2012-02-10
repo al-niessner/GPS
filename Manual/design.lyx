@@ -1800,6 +1800,501 @@ Firmware
 \end_layout
 
 \begin_layout Subsection
+Architecture
+\end_layout
+
+\begin_layout Standard
+Shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Firmware-Use-Case"
+
+\end_inset
+
+ are the five asynchronous actors provide stimuli the firmware: One, the
+ USB interface sends requests on a schedule that is determined by the host
+ computer and the user, which is independent and not knowable at the firmware
+ layer.
+ Two, the user configures the GPS to send messages at a fixed rate.
+ In order to avoid writing a phase lock loop on the output of the GPS, the
+ GPS serial is simply considered to be asynchronous with the goal of reducing
+ complexity as the user changes configuration.
+ Three, the Timer generates a Time Event for the microcontroller as a simple
+ method for computing durations without requiring a wall clock.
+ Four, the SD Card SPI interface and the FSM.
+ These two items are essentially tied together as the FSM is the only item
+ which forces the SD Card to read and write.
+ Fifth and last, the user has two button to send signals to the FSM to cause
+ state changes.
+ However, the response to the buttons is not meant to be instanteous but
+ rather after a duration of being held.
+ Hence, the buttons are also tied to the FSM.
+ Therefore, there are four independent asychromous events, the USB, Serial,
+ Timer, and the FSM, and the two dependent asynchronous actors, the Buttons
+ and SD Card.
+\end_layout
+
+\begin_layout Standard
+The block diagram shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Firmware-Block-Diagram"
+
+\end_inset
+
+ illustrates the independence of the three actors USB, Serial, and Timer
+ from the FSM through the explicit user of a bi-directional FIFO.
+ The dependent actors SD Card and Button directly interface to the FSM.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename firmwareArch.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Firmware-Use-Case"
+
+\end_inset
+
+Firmware Use Case
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename firmBlock.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Firmware-Block-Diagram"
+
+\end_inset
+
+Firmware Block Diagram
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Design
+\end_layout
+
+\begin_layout Standard
+Without adding a multithreading module the microcontroller has three basic
+ contexts or threads to work with: the normal CPU cycle, the Low Priority
+ Interrupt (LPI), and the High Priority Interrupt (HPI).
+ The three basic threads should be sufficient to do all of the necessary
+ work.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Sequence-Diagram"
+
+\end_inset
+
+ shows how the three contexts work together to complete the entire task
+ set as defined in the use-case in Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Firmware-Use-Case"
+
+\end_inset
+
+.
+ The LPI is periodic and is responsible for time events as well as monitoring
+ the buttons.
+ The LPI must be implemented to use the least number of cycles since it
+ is perioidic.
+ The HPI is quasi-periodic and is responsible for shuffling data from the
+ input interfaces to the nominal context.
+ The USB interface should be aperiodic while the serial is periodic both
+ on long and short time scales.
+ While the USB demands are aperiodic any single command requires a lot of
+ processing power.
+ It will be easy for the user to swamp the capabilities of the microcontroller
+ by abusing the USB interface.
+ The serial interface, on the other hand, is much more predictable and should
+ require very few CPU cycles to complete its task.
+ The nominal task does all of the other work and is separate from the LPI
+ and HPI via a FIFO.
+\end_layout
+
+\begin_layout Standard
+The nominal context is responsible for getting the data onto the SD card,
+ processing USB commands, reacting to button presses, handling time events,
+ and maintaining the Finite State Machine (FSM).
+ The nominal context is a continuous loop that should never be idle.
+ Each cycle it performs the following steps in their priority order:
+\end_layout
+
+\begin_layout Enumerate
+Send one character to the SD card when data is queued.
+\end_layout
+
+\begin_layout Enumerate
+Process and react to any commands recently received from the USB.
+\end_layout
+
+\begin_layout Enumerate
+Process any time events that have been queued.
+\end_layout
+
+\begin_layout Enumerate
+Move the FSM forward.
+\end_layout
+
+\begin_layout Enumerate
+Optional; if there is no data queued for the SD card, idle until an interrupt.
+ Idling the CPU may save power but is probably diminishing returns.
+\end_layout
+
+\begin_layout Standard
+Given the HPI and LPI contexts are designed and implemented to be the fewest
+ number of instructions (least amount of work), the nominal context should
+ have pleanty of spare cycles for moving data to the SD card and handling
+ user IO.
+ The serial interface is sending a character every 70 
+\begin_inset Formula $\mu s$
+\end_inset
+
+ and the time event fires every 5 ms, which means the serial interface is
+ the driving component for how long a nominal context cycle should take.
+ However, the serial data arrives in bursts.
+ Therefore, the trade-off to be played is a deep FIFO against the aggregrate
+ time of the nominal context for a single cycle.
+\end_layout
+
+\begin_layout Standard
+The FIFO has become a critical design element because it now has to foster
+ extremely efficient communications between the interrupt contexts and the
+ nominal context to keep wasted cycles to a minimum plus it has to allow
+ for minimal memory usage to allow for the greatest depth to handle busy
+ times.
+ The other critical design item is the FSM to minimize the number of CPU
+ cycles during transitions.
+ Both of these design elements are covered later in subsections.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename seq.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Sequence-Diagram"
+
+\end_inset
+
+Sequence Diagram
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:FIFO"
+
+\end_inset
+
+FIFO
+\end_layout
+
+\begin_layout Standard
+In order to reduce memory consumption and FIFO complexity, the timing and
+ context interactions are used to optimize the communications.
+ However, all communications can be conceptualized as a FIFO with a very
+ small buffer.
+\end_layout
+
+\begin_layout Standard
+The Time Event FIFO can be reduced to a FIFO with a depth of one keeping
+ only the latest entry due to the low rate of the events.
+ Time Events are generated at 1 Hz giving the nominal context time to reset
+ the Time Event flag prior to the next Time Event.
+ In the situation where the nominal context does not process a Time Event
+ before the next occurence, then the old event is lost and the nominal context
+ will only ever see the latest event.
+ The LPI will write the data from top to bottom as shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Time-Event-FIFO"
+
+\end_inset
+
+.
+ The nominal context will read them from bottom to top and then clear the
+ Time Event flag.
+ Given the load of processor and the frequency of the Time Event, this form
+ of FIFO should be sufficient for normal operation.
+\end_layout
+
+\begin_layout Standard
+The USB FIFO can be reduced to a FIFO with a depth of two keeping only the
+ latest due to the low rate of the events.
+ The idea of a FIFO of depth of two is so that one can be read while the
+ other is being filled, which is the design shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:USB-FIFO"
+
+\end_inset
+
+.
+ Normally, the USB commands should come far enough apart that a single FIFO
+ depth would be sufficient.
+ However, the two depth design allows for the small starvations of the nominal
+ context while still retaining the last two commands.
+\end_layout
+
+\begin_layout Standard
+There are then two FIFOs for messages that are being written to the SD card.
+ The simplest is a circular buffer that the nominal context fills and empties.
+ Because only one context controls the entire FIFO data flow, it is best
+ represented with a simple circular buffer.
+ The more complex FIFO is the serial data from the GPS chip to the SD card.
+ It also uses a circular buffer but the control is split between the HPI
+ and nominal contexts as shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Serial-FIFO"
+
+\end_inset
+
+.
+ There are small gaps that will cause messages to be lost, but the loss
+ is alright given that it is small compared to the amount of data collected.
+ It is also possible that messages may become corrput either from the nominal
+ context starving and not emptying the circular buffer or some other unrealized
+ path.
+ In any case, it is the responsibility of the reader of the SD card to be
+ robust against these simple types of errors.
+ NMEA sentences are all terminated with a <LF> and they contain checksums
+ giving the reading software the ability to detect these kinds of errors.
+\end_layout
+
+\begin_layout Standard
+In all these designs, it is important that the nominal context is not starved.
+ If and when the nominal context is starved, then the FIFO desgins fall
+ apart causing the data to become corrupt.
+ While the system is designed for reset to recover to a known state including
+ the FIFOs, the FIFO design is also robust enough that it will recover when
+ the nominal context starvation has ended.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename lpiFIFO.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Time-Event-FIFO"
+
+\end_inset
+
+Time Event FIFO
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The top row is the context and the variables being manipulated are shown
+ as the boxes.
+ The dashed lines show the context barriers while the arrows to and from
+ the boxes show the data direction.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename usbFIFO.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:USB-FIFO"
+
+\end_inset
+
+USB FIFO
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The top row is the context and the variables being manipulated are shown
+ as the boxes.
+ The dashed lines show the context barriers while the arrows to and from
+ the boxes show the data direction.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename serFIFO.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Serial-FIFO"
+
+\end_inset
+
+Serial FIFO
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The top row is the context and the variables being manipulated are shown
+ as the boxes.
+ The dashed lines show the context barriers while the arrows to and from
+ the boxes show the data direction.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:Finite-State-Machine"
@@ -1902,11 +2397,15 @@ S2 Track
 \end_layout
 
 \begin_layout Enumerate
-Change the state of the button LED
+Change the state of the button LED: rising edge on, falling edge off
 \end_layout
 
 \begin_layout Enumerate
-When light is on, put $PDIYNT,,*1E<CR><LF> into push buffer
+When button is on rising edge, put $PDIYNT,,*1E<CR><LF> into push buffer
+\end_layout
+
+\begin_layout Enumerate
+When falling edge, clear duration
 \end_layout
 
 \begin_layout Enumerate
@@ -1918,11 +2417,15 @@ S3 Waypoint
 \end_layout
 
 \begin_layout Enumerate
-Change the state of the button LED
+Change the state of the button LED: rising edge on, falling edge off
 \end_layout
 
 \begin_layout Enumerate
-When light is on, put $PDIYWP,*2F<CR><LF> into push buffer
+When rising edge, put $PDIYWP,*2F<CR><LF> into push buffer
+\end_layout
+
+\begin_layout Enumerate
+When falling edge clear duration
 \end_layout
 
 \begin_layout Enumerate
