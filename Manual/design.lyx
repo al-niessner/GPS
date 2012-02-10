@@ -2017,12 +2017,63 @@ Given the HPI and LPI contexts are designed and implemented to be the fewest
 \begin_layout Standard
 The FIFO has become a critical design element because it now has to foster
  extremely efficient communications between the interrupt contexts and the
- nominal context to keep wasted cycles to a minimum plus it has to allow
+ nominal context to keep wasted cycles to a minimum and it has to allow
  for minimal memory usage to allow for the greatest depth to handle busy
  times.
  The other critical design item is the FSM to minimize the number of CPU
  cycles during transitions.
  Both of these design elements are covered later in subsections.
+\end_layout
+
+\begin_layout Standard
+The software is divided into eight logical components as shown in Figure
+ 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Firware-Dependency"
+
+\end_inset
+
+ which form a very simple stack.
+ Each logical component is then composed of a set of files each beginning
+ with their compent name.
+ For instance, the memory component could have three files: memory_ram.h,
+ memory_rom.h, and memory_types.h.
+ The RAM and ROM versions are for the different memory regions while the
+ types simply defines the various types contained in RAM and ROM.
+ The file name to software modules is:
+\end_layout
+
+\begin_layout Description
+main main.c, main_config.h, main_eeprom.h, main_profile.h
+\end_layout
+
+\begin_layout Description
+contexts contexts.{c,h}
+\end_layout
+
+\begin_layout Description
+fifo fifo.{h,c} fifo_serial.c
+\end_layout
+
+\begin_layout Description
+fsm fsm.{h,c}
+\end_layout
+
+\begin_layout Description
+sdcard sdcard.{h,c}
+\end_layout
+
+\begin_layout Description
+serial serial.{h,c}
+\end_layout
+
+\begin_layout Description
+usb usb.{h,c}, usb_commands.h, usb_config.h, usb_desc.h
+\end_layout
+
+\begin_layout Description
+memory memory_ram.h, memory_rom.h, memory_types.h, memory_version.h
 \end_layout
 
 \begin_layout Standard
@@ -2057,6 +2108,50 @@ Sequence Diagram
 \end_inset
 
 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename firmDep.svg
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Firware-Dependency"
+
+\end_inset
+
+Firware Dependency
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Blocks depend on those below them.
+ Sideways and upward relationships do not exist.
 \end_layout
 
 \end_inset
