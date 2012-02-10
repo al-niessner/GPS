@@ -104,5 +104,5 @@ void begin_fsm()
    {
       USBDriverService();     // See usbdrv.c
       BootService();          // See boot.c
-   } 
+   }
 }
