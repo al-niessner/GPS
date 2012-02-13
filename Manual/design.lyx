@@ -172,8 +172,8 @@ Mark
 \end_inset
 
 Waypoint Mark the next sample as an important waypoint.
- Requires that the waypoint button be pused until the user is signaled with
- the button acceptance LED.
+ Requires that the waypoint button be pushed until the user is signaled
+ with the button acceptance LED.
 \end_layout
 
 \begin_layout Labeling
@@ -184,7 +184,7 @@ New
 
 Track Place a marker in the data that all points after the maker belong
  to a new track.
- Requires that the track button be pused until the user is signaled with
+ Requires that the track button be pushed until the user is signaled with
  the button acceptance LED.
 \end_layout
 
@@ -193,11 +193,11 @@ The user can also connect and disconnect a high power device through a USB
  connector.
  When connected, power is received from the USB bus.
  The high powered device is the fancy display that allows the user to view
- thier location and track on maps or name the tracks and waypoints or save
+ their location and track on maps or name the tracks and waypoints or save
  them or configure the GPS or many other tasks.
  The high powered device should not need to be connected at all times, however.
- Thus the user can connect and disconnet a high powered device at will and
- the GPS recorder will continue to operate uninterrupted.
+ Thus the user can connect and disconnect a high powered device at will
+ and the GPS recorder will continue to operate uninterrupted.
 \end_layout
 
 \begin_layout Standard
@@ -1819,17 +1819,17 @@ reference "fig:Firmware-Use-Case"
  In order to avoid writing a phase lock loop on the output of the GPS, the
  GPS serial is simply considered to be asynchronous with the goal of reducing
  complexity as the user changes configuration.
- Three, the Timer generates a Time Event for the microcontroller as a simple
+ Three, the Timer generates a Time Event for the micro-controller as a simple
  method for computing durations without requiring a wall clock.
  Four, the SD Card SPI interface and the FSM.
  These two items are essentially tied together as the FSM is the only item
  which forces the SD Card to read and write.
  Fifth and last, the user has two button to send signals to the FSM to cause
  state changes.
- However, the response to the buttons is not meant to be instanteous but
+ However, the response to the buttons is not meant to be instantaneous but
  rather after a duration of being held.
  Hence, the buttons are also tied to the FSM.
- Therefore, there are four independent asychromous events, the USB, Serial,
+ Therefore, there are four independent asynchronous events, the USB, Serial,
  Timer, and the FSM, and the two dependent asynchronous actors, the Buttons
  and SD Card.
 \end_layout
@@ -1930,7 +1930,7 @@ Design
 \end_layout
 
 \begin_layout Standard
-Without adding a multithreading module the microcontroller has three basic
+Without adding a multi-threading module the micro-controller has three basic
  contexts or threads to work with: the normal CPU cycle, the Low Priority
  Interrupt (LPI), and the High Priority Interrupt (HPI).
  The three basic threads should be sufficient to do all of the necessary
@@ -1954,14 +1954,14 @@ reference "fig:Firmware-Use-Case"
  The LPI is periodic and is responsible for time events as well as monitoring
  the buttons.
  The LPI must be implemented to use the least number of cycles since it
- is perioidic.
+ is periodic.
  The HPI is quasi-periodic and is responsible for shuffling data from the
  input interfaces to the nominal context.
  The USB interface should be aperiodic while the serial is periodic both
  on long and short time scales.
  While the USB demands are aperiodic any single command requires a lot of
  processing power.
- It will be easy for the user to swamp the capabilities of the microcontroller
+ It will be easy for the user to swamp the capabilities of the micro-controller
  by abusing the USB interface.
  The serial interface, on the other hand, is much more predictable and should
  require very few CPU cycles to complete its task.
@@ -2001,7 +2001,7 @@ Optional; if there is no data queued for the SD card, idle until an interrupt.
 \begin_layout Standard
 Given the HPI and LPI contexts are designed and implemented to be the fewest
  number of instructions (least amount of work), the nominal context should
- have pleanty of spare cycles for moving data to the SD card and handling
+ have plenty of spare cycles for moving data to the SD card and handling
  user IO.
  The serial interface is sending a character every 70 
 \begin_inset Formula $\mu s$
@@ -2010,7 +2010,7 @@ Given the HPI and LPI contexts are designed and implemented to be the fewest
  and the time event fires every 5 ms, which means the serial interface is
  the driving component for how long a nominal context cycle should take.
  However, the serial data arrives in bursts.
- Therefore, the trade-off to be played is a deep FIFO against the aggregrate
+ Therefore, the trade-off to be played is a deep FIFO against the aggregate
  time of the nominal context for a single cycle.
 \end_layout
 
@@ -2036,7 +2036,7 @@ reference "fig:Firware-Dependency"
 
  which form a very simple stack.
  Each logical component is then composed of a set of files each beginning
- with their compent name.
+ with their component name.
  For instance, the memory component could have three files: memory_ram.h,
  memory_rom.h, and memory_types.h.
  The RAM and ROM versions are for the different memory regions while the
@@ -2073,7 +2073,7 @@ usb usb.{h,c}, usb_commands.h, usb_config.h, usb_desc.h
 \end_layout
 
 \begin_layout Description
-memory memory_ram.h, memory_rom.h, memory_types.h, memory_version.h
+memory memory.h, memory_ram.h, memory_rom.h, memory_types.h, memory_version.h
 \end_layout
 
 \begin_layout Standard
@@ -2141,7 +2141,7 @@ name "fig:Firware-Dependency"
 
 \end_inset
 
-Firware Dependency
+Firmware Dependency
 \end_layout
 
 \end_inset
@@ -2182,8 +2182,8 @@ The Time Event FIFO can be reduced to a FIFO with a depth of one keeping
  Time Events are generated at 1 Hz giving the nominal context time to reset
  the Time Event flag prior to the next Time Event.
  In the situation where the nominal context does not process a Time Event
- before the next occurence, then the old event is lost and the nominal context
- will only ever see the latest event.
+ before the next occurrence, then the old event is lost and the nominal
+ context will only ever see the latest event.
  The LPI will write the data from top to bottom as shown in Figure 
 \begin_inset CommandInset ref
 LatexCommand vref
@@ -2233,7 +2233,7 @@ reference "fig:Serial-FIFO"
 .
  There are small gaps that will cause messages to be lost, but the loss
  is alright given that it is small compared to the amount of data collected.
- It is also possible that messages may become corrput either from the nominal
+ It is also possible that messages may become corrupt either from the nominal
  context starving and not emptying the circular buffer or some other unrealized
  path.
  In any case, it is the responsibility of the reader of the SD card to be
@@ -2244,7 +2244,7 @@ reference "fig:Serial-FIFO"
 
 \begin_layout Standard
 In all these designs, it is important that the nominal context is not starved.
- If and when the nominal context is starved, then the FIFO desgins fall
+ If and when the nominal context is starved, then the FIFO designs fall
  apart causing the data to become corrupt.
  While the system is designed for reset to recover to a known state including
  the FIFOs, the FIFO design is also robust enough that it will recover when
@@ -2665,7 +2665,7 @@ Architecture
 \end_layout
 
 \begin_layout Standard
-The architecture is the vernerable Model-View-Controller and is shown in
+The architecture is the venerable Model-View-Controller and is shown in
  figure 
 \begin_inset CommandInset ref
 LatexCommand vref
@@ -2711,8 +2711,8 @@ file_io The part of the system that interacts with the local file system
 \end_layout
 
 \begin_layout Description
-start Is the top level most part of the sytem that has full visibility into
- the system.
+start Is the top level most part of the system that has full visibility
+ into the system.
 \end_layout
 
 \begin_layout Standard
@@ -2803,7 +2803,7 @@ gps.file_io package reads and writes to the file system.
 \begin_layout Description
 gps.gui package holds all of controls, models, and views of the data the
  user interacts with.
- The actual controls and views are in subpackages, the model and the GUI
+ The actual controls and views are in sub-packages, the model and the GUI
  frame that holds the control and view panels is contained in this package.
 \end_layout
 
