@@ -20,11 +20,9 @@
  *
  *********************************************************************/
 
-#ifndef GPS_SDCARD_H
-#define GPS_SDCARD_H
+#ifndef GPS_FSM_TYPES_H
+#define GPS_FSM_TYPES_H
 
-void sdcard_erase(void);
-void sdcard_initialize(void);
-void sdcard_save (char c);
+typedef enum { Undefined, S0, S1, S2, S3, S4, S5, S6, S7, S8, S9 } fsm_state_t;
 
 #endif

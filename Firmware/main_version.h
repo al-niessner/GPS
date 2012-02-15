@@ -20,11 +20,11 @@
  *
  *********************************************************************/
 
-#ifndef GPS_SDCARD_H
-#define GPS_SDCARD_H
+#ifndef GPS_MAIN_VERSION
+#define GPS_MAIN_VERSION
 
-void sdcard_erase(void);
-void sdcard_initialize(void);
-void sdcard_save (char c);
+#define GPS_MAJOR_VERSION  1
+#define GPS_MINOR_VERSION  0
+#define GPS_BUGFIX_VERSION 0
 
 #endif

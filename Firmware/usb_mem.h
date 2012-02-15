@@ -20,11 +20,11 @@
  *
  *********************************************************************/
 
-#ifndef GPS_SDCARD_H
-#define GPS_SDCARD_H
+#ifndef GPS_USB_MEMORY_H
+#define GPS_USB_MEMORY_H
 
-void sdcard_erase(void);
-void sdcard_initialize(void);
-void sdcard_save (char c);
+#include "usb_types.h"
+
+extern usb_device_info_t usb_dev_info;
 
 #endif

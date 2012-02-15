@@ -20,11 +20,26 @@
  *
  *********************************************************************/
 
-#ifndef GPS_SDCARD_H
-#define GPS_SDCARD_H
+#include "usb.h"
 
-void sdcard_erase(void);
-void sdcard_initialize(void);
-void sdcard_save (char c);
+#pragma code
 
-#endif
+void ctxt_initialize(void)
+{
+}
+
+#pragma interrupt ctxt_hpi
+void ctxt_hpi(void)
+{
+  usb_handler();
+}
+
+#pragma interruptlow ctxt_lpi
+void ctxt_lpi(void)
+{
+}
+
+void ctxt_nominal(void)
+{
+  usb_process();
+}

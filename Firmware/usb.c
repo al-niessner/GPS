@@ -20,11 +20,28 @@
  *
  *********************************************************************/
 
-#ifndef GPS_SDCARD_H
-#define GPS_SDCARD_H
+#pragma code
 
-void sdcard_erase(void);
-void sdcard_initialize(void);
-void sdcard_save (char c);
+#include "usb.h"
+#include "USB/usb.h"
+#include "USB/usb_function_generic.h"
 
-#endif
+void usb_initialize(void)
+{
+  USBDeviceInit();
+  USBDeviceAttach();
+}
+
+void usb_process(void)
+{
+  if ((USBGetDeviceState() < CONFIGURED_STATE) || USBIsDeviceSuspended())
+    { /* NO OP */ }
+  else
+    {
+    }
+}
+
+void usb_respond(void)
+{
+}
+
