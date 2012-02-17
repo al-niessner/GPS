@@ -2073,7 +2073,7 @@ contexts contexts.{c,h}
 \end_layout
 
 \begin_layout Description
-fifo fifo.{h,c} fifo_serial.c
+fifo fifo.{h,c}, fifo_mem.{h,c} fifo_serial.c
 \end_layout
 
 \begin_layout Description

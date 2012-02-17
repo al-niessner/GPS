@@ -23,7 +23,7 @@
 #ifndef GPS_USB_TYPES_H
 #define GPS_USB_TYPES_H
 
-#define USB_GEN_EP_SIZE 32U // maximum size of a USB packet
+#include <usb_config.h>
 
 typedef enum
 {
@@ -70,15 +70,15 @@ typedef struct usb_device_info
 {
   unsigned char product_id[2];
   unsigned char version_id[3];
-  unsigned char desc[USB_GEN_EP_SIZE - 7]; // 7 is number of bytes in struct
+  unsigned char desc[USBGEN_EP_SIZE - 7]; // 7 is number of bytes in struct
   unsigned char checksum;
 } usb_device_info_t;
 
 typedef union usb_data_packet
 {
-  unsigned char  _byte[USB_GEN_EP_SIZE];     //For byte access.
-  unsigned short _word[USB_GEN_EP_SIZE / 2];   //For word access.
-  unsigned long  _dword[USB_GEN_EP_SIZE / 4]; // For double-word access.
+  unsigned char  _byte[USBGEN_EP_SIZE];      // For byte access.
+  unsigned short _word[USBGEN_EP_SIZE / 2];  // For word access.
+  unsigned long  _dword[USBGEN_EP_SIZE / 4]; // For double-word access.
   struct
   {
     usb_cmd_t     cmd;
@@ -103,7 +103,7 @@ typedef union usb_data_packet
         unsigned char upper;
       };
     } ADR;
-    unsigned char data[USB_GEN_EP_SIZE - 5];
+    unsigned char data[USBGEN_EP_SIZE - 5];
   };
 } usb_data_packet_t;
 

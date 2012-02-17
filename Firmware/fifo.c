@@ -20,19 +20,36 @@
  *
  *********************************************************************/
 
-#ifndef GPS_FIFO_H
-#define GPS_FIFO_H
+#include "fifo.h"
+#include "fifo_mem.h"
 
-#include "memory_types.h"
-#include "usb_types.h"
+#pragma code
 
 void   fifo_initialize(void);
 
 bool_t fifo_fetch_time_event(void);
 void   fifo_push_time_event(void);
 
-bool_t fifo_fetch_usb (usb_data_packet_t *to_be_filled, unsigned char *len);
-void   fifo_push_usb (usb_data_packet_t *to_be_emptied);
+bool_t fifo_fetch_usb (usb_data_packet_t *result, unsigned char *len)
+{
+  bool_t ready = ((USBGetDeviceState() < CONFIGURED_STATE) ||
+                  USBIsDeviceSuspended()                   ||
+                  USBHandleBusy (usb_in_h[usb_in_idx]));
+
+  if (ready)
+    {
+      *len =  USBHandleGetLength (usb_in_h[usb_in_idx]);
+      memcpy ((void*)&usb_in[usb_in_idx], (void*)result, *len);
+      usb_in_h[usb_in_idx] =  USBGenRead (USBGEN_EP_NUM,
+                                          (unsigned char*)&usb_in[usb_in_idx],
+                                          USBGEN_EP_SIZE);
+      usb_in_idx ^= 1;
+    }
+
+  return ready;
+}
+
+void   fifo_push_usb (usb_data_packet_t *item);
 
 char   fifo_fetch_next(void);
 bool_t fifo_is_receiving(void);
