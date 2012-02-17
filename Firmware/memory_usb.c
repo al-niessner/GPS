@@ -16,6 +16,8 @@ static const rom usb_device_info_t usb_dev_info =
 #pragma udata
 static USB_HANDLE usb_in_h[2] = {0,0};   // endpoint handles rcving packets
 static USB_HANDLE usb_out_h[2]  = {0,0}; // endpoint handles sending packets
+static unsigned char usb_in_idx;
+static unsigned char usb_out_idx;
 
 #pragma udata usb_data_ram
 static usb_data_packet_t usb_in[2];  // buffers for rcving packets from host

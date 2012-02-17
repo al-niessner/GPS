@@ -21,11 +21,15 @@
  *********************************************************************/
 
 #include "fifo.h"
-#include "fifo_mem.h"
+#include "memory_usb.h"
 
 #pragma code
 
-void   fifo_initialize(void);
+void   fifo_initialize(void)
+{
+  usb_in_idx = 0;
+  usb_out_idx = 0;
+}
 
 bool_t fifo_fetch_time_event(void);
 void   fifo_push_time_event(void);

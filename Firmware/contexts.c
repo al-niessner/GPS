@@ -26,6 +26,32 @@
 
 void ctxt_initialize(void)
 {
+  // interrupts are off
+  INTCONbits.GIEH = 0;
+  INTCONbits.GIEL = 0;
+
+  // Enable high slew-rate for the I/O pins.
+  SLRCON = 0;
+
+  // Turn off analog input mode on I/O pins.
+  ANSEL = 0;
+  ANSELH = 0;
+
+  // Initialize the I/O pins.
+  INIT_GPIO0();
+  INIT_GPIO1();
+  INIT_GPIO2();
+  INIT_GPIO3();
+
+  #if defined( USE_USB_BUS_SENSE_IO )
+  tris_usb_bus_sense = INPUT_PIN;
+  #endif
+
+  usb_initialize();
+  // interrupts are on
+  RCONbits.IPEN     = 1;      // Enable prioritized interrupts.
+  INTCONbits.GIEH = 1;
+  INTCONbits.GIEL = 1;
 }
 
 #pragma interrupt ctxt_hpi

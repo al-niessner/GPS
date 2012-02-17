@@ -21,6 +21,7 @@
  *********************************************************************/
 
 #include "fifo.h"
+#include "memory.h"
 #include "usb.h"
 #include "USB/usb.h"
 #include "USB/usb_function_generic.h"
@@ -31,6 +32,11 @@ static usb_data_packet_t usb_inbound;
 static usb_data_packet_t usb_outbound;
 
 #pragma code
+
+void usb_handle(void)
+{
+  USBDeviceTasks();
+}
 
 void usb_initialize(void)
 {

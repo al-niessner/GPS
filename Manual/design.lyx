@@ -2065,7 +2065,7 @@ reference "fig:Firware-Dependency"
 \end_layout
 
 \begin_layout Description
-main main.c, main_config.h, main_eeprom.h, main_profile.h, main_version.h
+main main.c, main_config.h, main_eeprom.h, main_version.h
 \end_layout
 
 \begin_layout Description
@@ -2073,27 +2073,27 @@ contexts contexts.{c,h}
 \end_layout
 
 \begin_layout Description
-fifo fifo.{h,c}, fifo_mem.{h,c} fifo_serial.c
+fifo fifo.{h,c}, fifo_serial.c
 \end_layout
 
 \begin_layout Description
-fsm fsm.{h,c}, fsm_mem.{h,c}, fsm_types.h
+fsm fsm.{h,c}
 \end_layout
 
 \begin_layout Description
-sdcard sdcard.{h,c}, sdcard_mem.{h,c}, sdcard_types.h
+sdcard sdcard.{h,c}
 \end_layout
 
 \begin_layout Description
-serial serial.{h,c}, serial_mem.{h,c}, serial_types.h 
+serial serial.{h,c}
 \end_layout
 
 \begin_layout Description
-usb usb.{h,c}, usb_commands.h, usb_config.h, usb_desc.h, usb_types.h, usb_mem.{h,c}
+usb usb.{h,c}, usb_cb.c, usb_config.h, usb_desc.c, HardwareProfile.h
 \end_layout
 
 \begin_layout Description
-memory memory_types.h
+memory memory.h, memory_usb.{h,c}
 \end_layout
 
 \begin_layout Standard
