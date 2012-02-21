@@ -20,6 +20,11 @@
  *
  *********************************************************************/
 
+#include <USB/usb.h>
+
+#include "contexts.h"
+#include "fifo.h"
+#include "HardwareProfile.h"
 #include "usb.h"
 
 #pragma code
@@ -48,8 +53,10 @@ void ctxt_initialize(void)
   #endif
 
   usb_initialize();
+  fifo_initialize();
+
   // interrupts are on
-  RCONbits.IPEN     = 1;      // Enable prioritized interrupts.
+  RCONbits.IPEN   = 1;      // Enable prioritized interrupts.
   INTCONbits.GIEH = 1;
   INTCONbits.GIEL = 1;
 }
@@ -57,7 +64,7 @@ void ctxt_initialize(void)
 #pragma interrupt ctxt_hpi
 void ctxt_hpi(void)
 {
-  usb_handler();
+  usb_handle();
 }
 
 #pragma interruptlow ctxt_lpi

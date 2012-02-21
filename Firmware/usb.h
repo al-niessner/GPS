@@ -61,12 +61,14 @@ typedef enum
   JTAG_CMD               = 0x4f,  // Send multiple TMS & TDI bits while
                                   // receiving multiple TDO bits.
   FLASH_ONOFF_CMD        = 0x50,  // En(dis)able the FPGA configuration flash.
+
+  GPS_VER_CMD            = 0x80,  // Get the version of the GPS firmware
+
   RESET_CMD              = 0xff   // Cause a power-on reset.
 } usb_cmd_t;
 
 void usb_handle(void);
 void usb_initialize(void);
 void usb_process(void);
-void usb_respond(void);
 
 #endif

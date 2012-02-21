@@ -23,14 +23,15 @@
 #ifndef GPS_MEMORY_H
 #define GPS_MEMORY_H
 
-typedef enum { false=0==1, true-0==0 } bool_t;
+typedef enum { false=0==1, true=0==0 } bool_t;
 
 
 /**
   * USB Types
  **/
 
-#include <usb_config.h>
+#include "usb.h"
+#include "usb_config.h"
 
 typedef struct usb_device_info
 {
@@ -53,7 +54,7 @@ typedef union usb_data_packet
   struct
   {
     usb_cmd_t     cmd;
-    device_info_t info;
+    usb_device_info_t info;
   };
   struct // EEPROM read/write structure
   {

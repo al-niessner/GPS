@@ -20,6 +20,9 @@
  *
  *********************************************************************/
 
+#include <stdlib.h>
+#include <USB/usb_function_generic.h>
+
 #include "fifo.h"
 #include "memory_usb.h"
 
@@ -31,8 +34,8 @@ void   fifo_initialize(void)
   usb_out_idx = 0;
 }
 
-bool_t fifo_fetch_time_event(void);
-void   fifo_push_time_event(void);
+bool_t fifo_fetch_time_event(void) { return false; }
+void   fifo_push_time_event(void) {}
 
 bool_t fifo_fetch_usb (usb_data_packet_t *result, unsigned char *len)
 {
@@ -53,12 +56,27 @@ bool_t fifo_fetch_usb (usb_data_packet_t *result, unsigned char *len)
   return ready;
 }
 
-void   fifo_push_usb (usb_data_packet_t *item);
+void   fifo_push_usb (usb_data_packet_t *item, unsigned char len)
+{
+  unsigned char idx;
 
-char   fifo_fetch_next(void);
-bool_t fifo_is_receiving(void);
-void   fifo_push_message (char *s);
-void   fifo_push_serial (char c);
-void   fifo_set_valid (bool_t b);
+  if (len != 0U && len <= USBGEN_EP_NUM)
+    {
+      for (idx = 0 ; idx < len ; idx++)
+        {
+          usb_out[usb_out_idx]._byte[idx] = item->_byte[idx];
+        }
+      usb_out_h[usb_out_idx] =
+        USBGenWrite (USBGEN_EP_NUM,
+                     (unsigned char*)&usb_out[usb_out_idx],
+                     len);
+      usb_out_idx ^= 1;
+      while (USBHandleBusy (usb_out_h[usb_out_idx])) {}
+    }
+}
 
-#endif
+char   fifo_fetch_next(void) {}
+bool_t fifo_is_receiving(void) { return false; }
+void   fifo_push_message (char *s) {}
+void   fifo_push_serial (char c) {}
+void   fifo_set_valid (bool_t b) {}

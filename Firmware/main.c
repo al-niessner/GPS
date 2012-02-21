@@ -21,7 +21,7 @@
  *********************************************************************/
 
 #include "contexts.h"
-#include "memory_types.h"
+#include "memory.h"
 
 /** VECTOR REMAPPING *******************************************/
 #define REMAPPED_RESET_VECTOR_ADDRESS 0x800

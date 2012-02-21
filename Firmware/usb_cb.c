@@ -20,6 +20,10 @@
  *
  *********************************************************************/
 
+#include <USB/usb.h>
+#include <USB/usb_function_generic.h>
+#include "memory_usb.h"
+
 #pragma code
 
 /*
@@ -357,7 +361,7 @@ void USBCBStdSetDscHandler( void )
  *******************************************************************/
 void USBCBSendResume( void )
 {
-    static WORD delay_count;
+    static unsigned int delay_count;
 
     USBResumeControl = 1;                // Start RESUME signaling
 
@@ -368,6 +372,30 @@ void USBCBSendResume( void )
     USBResumeControl = 0;
 }
 
+
+/*
+ * This function is called when the device becomes initialized, which occurs
+ * after the host sends a SET_CONFIGURATION (wValue not = 0) request. 
+ * This callback function should initialize the endpoints for the device's
+ * usage according to the current configuration.
+ */
+void USBCBInitEP (void)
+{
+    // Enable the endpoint.
+    USBEnableEndpoint (USBGEN_EP_NUM,
+                       USB_OUT_ENABLED | USB_IN_ENABLED |
+                       USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
+    // Now begin waiting for the first packets to be received from the host
+    usb_in_idx = 0;
+    usb_in_h[0] = USBGenRead (USBGEN_EP_NUM,
+                              (unsigned char*)&usb_in[0],
+                              USBGEN_EP_SIZE);
+    usb_in_h[1] = USBGenRead (USBGEN_EP_NUM,
+                              (unsigned char*)&usb_in[1], 
+                              USBGEN_EP_SIZE);
+    // Initialize the pointer to the buffer which will return data to the host
+    usb_out_idx = 0;
+}
 
 
 /*******************************************************************
@@ -391,7 +419,7 @@ void USBCBSendResume( void )
 *
 * Note:            None
 *******************************************************************/
-BOOL USER_USB_CALLBACK_EVENT_HANDLER( USB_EVENT event, void *pdata, WORD size )
+BOOL USER_USB_CALLBACK_EVENT_HANDLER( USB_EVENT event, void *pdata, unsigned int size )
 {
     switch ( event )
     {
@@ -433,26 +461,3 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER( USB_EVENT event, void *pdata, WORD size )
     return TRUE;
 } /* USER_USB_CALLBACK_EVENT_HANDLER */
 
-/*
- * This function is called when the device becomes initialized, which occurs
- * after the host sends a SET_CONFIGURATION (wValue not = 0) request. 
- * This callback function should initialize the endpoints for the device's
- * usage according to the current configuration.
- */
-void USBCBInitEP( void )
-{
-    // Enable the endpoint.
-    USBEnableEndpoint (USBGEN_EP_NUM,
-                       USB_OUT_ENABLED | USB_IN_ENABLED |
-                       USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
-    // Now begin waiting for the first packets to be received from the host
-    usb_in_idx = 0;
-    usb_in_h[0] = USBGenRead (USBGEN_EP_NUM,
-                              (unsigned char*)&usb_in[0],
-                              USBGEN_EP_SIZE);
-    usb_in_h[1] = USBGenRead (USBGEN_EP_NUM,
-                              (unsigned char*)&usb_in[1], 
-                              USBGEN_EP_SIZE);
-    // Initialize the pointer to the buffer which will return data to the host
-    usb_out_idx = 0;
-}

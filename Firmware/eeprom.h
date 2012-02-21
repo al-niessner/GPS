@@ -20,23 +20,10 @@
  *
  *********************************************************************/
 
-#ifndef GPS_FIFO_H
-#define GPS_FIFO_H
+#ifndef GPS_EEPROM_H
+#define GPS_EEPROM_H
 
-#include "memory.h"
-
-void   fifo_initialize(void);
-
-bool_t fifo_fetch_time_event(void);
-void   fifo_push_time_event(void);
-
-bool_t fifo_fetch_usb (usb_data_packet_t *to_be_filled, unsigned char *len);
-void   fifo_push_usb (usb_data_packet_t *to_be_emptied, unsigned char len);
-
-char   fifo_fetch_next(void);
-bool_t fifo_is_receiving(void);
-void   fifo_push_message (char *s);
-void   fifo_push_serial (char c);
-void   fifo_set_valid (bool_t b);
+unsigned char eeprom_read  (unsigned char address);
+void          eeprom_write (unsigned char address, unsigned char data);
 
 #endif

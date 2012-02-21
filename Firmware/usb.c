@@ -20,11 +20,24 @@
  *
  *********************************************************************/
 
+#include <USB/usb.h>
+#include <USB/usb_function_generic.h>
+
+#include "eeprom.h"
 #include "fifo.h"
-#include "memory.h"
+#include "memory_version.h"
 #include "usb.h"
-#include "USB/usb.h"
-#include "USB/usb_function_generic.h"
+
+#define GPS_PRODUCT_ID 0x00,0x03
+
+#pragma romdata
+static const rom usb_device_info_t usb_dev_info =
+  {
+    GPS_PRODUCT_ID,
+    GPS_MAJOR_VERSION, GPS_MINOR_VERSION, GPS_BUGFIX_VERSION,
+    "DIY GPS on XuDL", // Description string.
+    0x00               // Checksum (filled in later).
+  };
 
 #pragma udata
 
@@ -50,52 +63,56 @@ void usb_process(void)
 
   if (fifo_fetch_usb (&usb_inbound, &len))
     {
+      unsigned char buffer_cntr;
       unsigned char num_return_bytes; // Number of bytes to return in response
       unsigned char cmd;              // Store the command in the rcved packet
       unsigned int  lcntr;
+      
+      int blink_counter;
 
       num_return_bytes = 0;  // Initially, assume nothing needs to be returned
       blink_counter    = 10; // Blink the LED whenever a USB 
-      switch (inbound.bcmd)
+      switch (usb_inbound.cmd)
         {
         case ID_BOARD_CMD:
           // Blink the LED in order to identify the board.
-          blink_counter                  = 50;
-          InPacket->cmd                  = cmd;
-          num_return_bytes               = 1;
+          blink_counter    = 50;
+          usb_outbound.cmd = cmd;
+          num_return_bytes = 1;
           break;
 
         case INFO_CMD:
-          usb_outbound._dword[0] = numBlocks;
-          usb_outbound._word[2]  = rdBlockSize;
-          usb_outbound._word[3]  = wrBlockSize;
-          usb_outbound._word[4]  = eraseSize;
+          usb_outbound._word[2]  = 0;
+          usb_outbound._word[3]  = 0;
+          usb_outbound._word[4]  = 0;
           num_return_bytes = 16;
           break;
           
+        case GPS_VER_CMD:
           // Return a packet with information about this USB interface device.
           usb_outbound.cmd = cmd;
-          memcpypgm2ram ((void*)( (BYTE *)usb_outbound.info),
-                         (const rom void*)&usb_dev_info,
-                         sizeof (usb_device_info));
-          num_return_bytes  = sizeof (usb_device_info) + 1;
+          memcpypgm2ram (&usb_outbound.info,
+                         &usb_dev_info,
+                         sizeof (usb_device_info_t));
+          num_return_bytes  = sizeof (usb_device_info_t) + 1;
           break;
               
         case READ_EEDATA_CMD:
-          usb_outbound->cmd = usb_inbound->cmd;
-          for(buffer_cntr=0; buffer_cntr < usb_inbound.len; buffer_cntr++)
+          usb_outbound.cmd = usb_inbound.cmd;
+          for (buffer_cntr=0; buffer_cntr < usb_inbound.len; buffer_cntr++)
             {
-              usb_inbound.data[buffer_cntr] = ReadEeprom((unsigned char)usb_inbound.ADR.pAdr + buffer_cntr);
+              usb_inbound.data[buffer_cntr] = 
+                eeprom_read ((unsigned char)usb_inbound.ADR.pAdr + buffer_cntr);
             }
           num_return_bytes = buffer_cntr + 5;
           break;
               
         case WRITE_EEDATA_CMD:
-          usb_outbound->cmd = usb_inbound->cmd;
+          usb_outbound.cmd = usb_inbound.cmd;
           for(buffer_cntr=0; buffer_cntr < usb_inbound.len; buffer_cntr++)
             {
-              WriteEeprom((BYTE)usb_inbound.ADR.pAdr + buffer_cntr,
-                          usb_inbound.data[buffer_cntr]);
+              eeprom_write ((BYTE)usb_inbound.ADR.pAdr + buffer_cntr,
+                            usb_inbound.data[buffer_cntr]);
             }
           num_return_bytes = 1;
           break;
@@ -113,21 +130,9 @@ void usb_process(void)
           num_return_bytes = 0;
           break;
         } /* switch */
-      
-      if ( num_return_bytes != 0U )
-        {
-          InHandle[InIndex] = USBGenWrite( USBGEN_EP_NUM, (BYTE *)InPacket, num_return_bytes ); // Now send the packet.
-          InIndex ^= 1;
-          while ( USBHandleBusy( InHandle[InIndex] ) )
-            {
-              ;                           // Wait until transmitter is not busy.
-            }
-          InPacket = &InBuffer[InIndex];
-            }
-    }
-}
 
-void usb_respond(void)
-{
+      if (num_return_bytes != 0U)
+        fifo_push_usb (&usb_outbound, num_return_bytes);
+    }
 }
 

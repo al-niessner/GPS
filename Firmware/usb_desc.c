@@ -154,13 +154,14 @@
 #define __USB_DESCRIPTORS_C
 
 /** INCLUDES *******************************************************/
-#include "./USB/usb.h"
-#include "version.h"
+#include <USB/usb.h>
 
 /** CONSTANTS ******************************************************/
 #if defined( __18CXX )
 #pragma romdata
 #endif
+
+#define USB_FMW_VERSION 0x0100
 
 /* Device Descriptor */
 ROM USB_DEVICE_DESCRIPTOR device_dsc
