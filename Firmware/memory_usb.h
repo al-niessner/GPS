@@ -28,14 +28,15 @@
 #include "memory_version.h"
 #include "memory.h"
 
+#pragma udata usb_stack_ram
+static usb_data_packet_t usb_out[2]; // buffers for sending packets from host
+static usb_data_packet_t usb_in[2];  // buffers for rcving packets to host
+
 #pragma udata
 static USB_HANDLE usb_in_h[2] = {0,0};   // endpoint handles rcving packets
 static USB_HANDLE usb_out_h[2]  = {0,0}; // endpoint handles sending packets
 static unsigned char usb_in_idx;
 static unsigned char usb_out_idx;
 
-#pragma udata usb_data_ram
-static usb_data_packet_t usb_in[2];  // buffers for rcving packets from host
-static usb_data_packet_t usb_out[2]; // buffers for sending packets to host
 
 #endif

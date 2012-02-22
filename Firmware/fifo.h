@@ -26,6 +26,7 @@
 #include "memory.h"
 
 void   fifo_initialize(void);
+void   fifo_initialize_usb(void);
 
 bool_t fifo_fetch_time_event(void);
 void   fifo_push_time_event(void);

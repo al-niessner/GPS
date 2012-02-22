@@ -22,7 +22,8 @@
 
 #include <USB/usb.h>
 #include <USB/usb_function_generic.h>
-#include "memory_usb.h"
+
+#include "fifo.h"
 
 #pragma code
 
@@ -381,20 +382,7 @@ void USBCBSendResume( void )
  */
 void USBCBInitEP (void)
 {
-    // Enable the endpoint.
-    USBEnableEndpoint (USBGEN_EP_NUM,
-                       USB_OUT_ENABLED | USB_IN_ENABLED |
-                       USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
-    // Now begin waiting for the first packets to be received from the host
-    usb_in_idx = 0;
-    usb_in_h[0] = USBGenRead (USBGEN_EP_NUM,
-                              (unsigned char*)&usb_in[0],
-                              USBGEN_EP_SIZE);
-    usb_in_h[1] = USBGenRead (USBGEN_EP_NUM,
-                              (unsigned char*)&usb_in[1], 
-                              USBGEN_EP_SIZE);
-    // Initialize the pointer to the buffer which will return data to the host
-    usb_out_idx = 0;
+  fifo_initialize_usb();
 }
 
 

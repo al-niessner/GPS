@@ -120,8 +120,8 @@
 /** ENDPOINTS ALLOCATION *******************************************/
 
 /* Generic */
-#define USBGEN_EP_SIZE 32U
-#define USBGEN_EP_NUM 1U
+#define USBGEN_EP_SIZE 32u
+#define USBGEN_EP_NUM 1u
 
 /** DEFINITIONS ****************************************************/
 

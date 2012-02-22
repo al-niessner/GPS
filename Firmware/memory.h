@@ -43,9 +43,8 @@ typedef struct usb_device_info
 
 typedef union usb_data_packet
 {
-  unsigned char  _byte[USBGEN_EP_SIZE];      // For byte access.
-  unsigned short _word[USBGEN_EP_SIZE / 2];  // For word access.
-  unsigned long  _dword[USBGEN_EP_SIZE / 4]; // For double-word access.
+  unsigned char      _byte[USBGEN_EP_SIZE];
+  unsigned short int _word[USBGEN_EP_SIZE / 2];
   struct
   {
     usb_cmd_t     cmd;
