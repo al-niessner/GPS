@@ -23,10 +23,10 @@
 #include <USB/usb.h>
 #include <USB/usb_function_generic.h>
 
-#include "eeprom.h"
 #include "fifo.h"
 #include "memory_version.h"
 #include "usb.h"
+#include "usb_eeprom.h"
 
 #define GPS_PRODUCT_ID 0x00,0x03
 
@@ -35,7 +35,7 @@ static const rom usb_device_info_t usb_dev_info =
   {
     GPS_PRODUCT_ID,
     GPS_MAJOR_VERSION, GPS_MINOR_VERSION, GPS_BUGFIX_VERSION,
-    "DIY GPS on XuDL", // Description string.
+    "GPS on XuDL: Al Niessner", // Description string.
     0x00               // Checksum (filled in later).
   };
 
@@ -68,15 +68,10 @@ void usb_process(void)
       unsigned char cmd;              // Store the command in the rcved packet
       unsigned int  lcntr;
       
-      int blink_counter;
-
       num_return_bytes = 0;  // Initially, assume nothing needs to be returned
-      blink_counter    = 10; // Blink the LED whenever a USB 
       switch (usb_inbound.cmd)
         {
         case ID_BOARD_CMD:
-          // Blink the LED in order to identify the board.
-          blink_counter    = 50;
           usb_outbound.cmd = cmd;
           num_return_bytes = 1;
           break;

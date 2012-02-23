@@ -2068,19 +2068,23 @@ reference "fig:Firware-Dependency"
 \end_layout
 
 \begin_layout Description
-main main.c, main_config.h, main_eeprom.h, main_version.h
-\end_layout
-
-\begin_layout Description
 contexts contexts.{c,h}
 \end_layout
 
 \begin_layout Description
-fifo fifo.{h,c}, fifo_serial.c
+fifo fifo.{h,c}, fifo_usb.c
 \end_layout
 
 \begin_layout Description
 fsm fsm.{h,c}
+\end_layout
+
+\begin_layout Description
+main main.c, main_config.c
+\end_layout
+
+\begin_layout Description
+memory memory.h, memory_version.h, HardwareProfile.h
 \end_layout
 
 \begin_layout Description
@@ -2092,11 +2096,7 @@ serial serial.{h,c}
 \end_layout
 
 \begin_layout Description
-usb usb.{h,c}, usb_cb.c, usb_config.h, usb_desc.c, HardwareProfile.h
-\end_layout
-
-\begin_layout Description
-memory memory.h, memory_usb.{h,c}
+usb usb.{h,c}, usb_cb.c, usb_config.h, usb_desc.c, usb_eeprom.{h,c}
 \end_layout
 
 \begin_layout Standard
@@ -2175,6 +2175,9 @@ Firmware Dependency
 \begin_layout Plain Layout
 Blocks depend on those below them.
  Sideways and upward relationships do not exist.
+ The only downward dependency only is not exactly true.
+ There are macro definitions that are specific to a unit, like USB, that
+ are needed in memory for defining the complex types.
 \end_layout
 
 \end_inset

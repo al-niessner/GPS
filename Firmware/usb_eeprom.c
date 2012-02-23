@@ -22,7 +22,7 @@
 
 #include <Compiler.h>
 
-#include "eeprom.h"
+#include "usb_eeprom.h"
 
 unsigned char eeprom_read  (unsigned char address)
 {
