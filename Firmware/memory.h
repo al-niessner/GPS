@@ -42,8 +42,7 @@ typedef enum
   WRITE_EEDATA_CMD       = 0x05,  // Write to the device EEPROM.
   READ_CONFIG_CMD        = 0x06,  // Read from the device configuration memory.
   WRITE_CONFIG_CMD       = 0x07,  // Write to the device configuration memory.
-  ID_BOARD_CMD           = 0x31,  // Flash the device LED to identify which
-                                  // device is being communicated with.
+  ID_BOARD_CMD           = 0x31,  // Called when the host connects to the dev.
   UPDATE_LED_CMD         = 0x32,  // Change the state of the device LED.
   INFO_CMD               = 0x40,  // Get information about the USB interface.
   SENSE_INVERTERS_CMD    = 0x41,  // ** Sense inverters on TCK and TDO pins of

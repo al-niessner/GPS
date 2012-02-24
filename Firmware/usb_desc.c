@@ -242,8 +242,9 @@ ROM struct
 }
 sd001 = {
     sizeof( sd001 ), USB_DESCRIPTOR_STRING,
-    { 'X', ' ', 'E', 'n', 'g', 'i', 'n', 'e', 'e', 'r', 'i', 'n', 'g', ' ',
-      'S', 'o', 'f', 't', 'w', 'a', 'r', 'e', ' ', 'S', 'y', 's', 't', 'e', 'm', 's', ' ', 'C', 'o', 'r', 'p', '.' }
+    { 'D', 'I', 'Y', ' ', 'E', 'n', 'g', 'i', 'n', 'e', 'e', 'r', 'i', 'n', 'g',
+      ' ', 'b', 'y', ' ', 'A', 'l', ' ', 'N', 'i', 'e', 's', 's', 'n', 'e', 'r',
+      '.' }
 };
 
 //Product string descriptor
@@ -255,8 +256,8 @@ ROM struct
 }
 sd002 = {
     sizeof( sd002 ), USB_DESCRIPTOR_STRING,
-    { 'X', 'u', 'L', 'A', ' ', '-', ' ', 'X', 'E', 'S', 'S', ' ', 'M', 'i', 'c', 'r', 'o', ' ', 'L', 'o', 'g', 'i', 'c',
-      ' ', 'A', 'r', 'r', 'a', 'y' }
+    { 'G', 'P', 'S', ' ', 'o', 'n', ' ', 'a', ' ', 'X', 'u', 'D', 'L', ' ',
+      'b', 'o', 'a', 'r', 'd' }
 };
 
 //Array of configuration descriptors
