@@ -71,18 +71,6 @@ void usb_process(void)
       num_return_bytes = 0;  // Initially, assume nothing needs to be returned
       switch (usb_inbound.cmd)
         {
-        case ID_BOARD_CMD:
-          usb_outbound.cmd = cmd;
-          num_return_bytes = 1;
-          break;
-
-        case INFO_CMD:
-          usb_outbound._word[2]  = 0;
-          usb_outbound._word[3]  = 0;
-          usb_outbound._word[4]  = 0;
-          num_return_bytes = 16;
-          break;
-          
         case GPS_VER_CMD:
           // Return a packet with information about this USB interface device.
           usb_outbound.cmd = cmd;
