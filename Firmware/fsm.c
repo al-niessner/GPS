@@ -192,27 +192,24 @@ void fsm_initialize(void)
 
 void fsm_process (void)
 {
-  fsm_state_t next=INDETERMINATE, working=fsm_adjust (current);
-
-  switch (working)
+  switch (fsm_adjust (current))
     {
-    case S0: next = fsm_idle (false); break;
-    case S1: next = fsm_idle (true);  break;
-    case S2: next = fsm_track();      break;
-    case S3: next = fsm_waypt();      break;
-    case S4: next = fsm_uart ();      break;
-    case S5: next = fsm_usb  ();      break;
-    case S6: next = fsm_clear();      break;
-    case S7: next = fsm_push ();      break;
-    case S8: next = fsm_send ();      break;
-    case S9: next = fsm_pop  ();      break;
+    case S0: current = fsm_idle (false); break;
+    case S1: current = fsm_idle (true);  break;
+    case S2: current = fsm_track();      break;
+    case S3: current = fsm_waypt();      break;
+    case S4: current = fsm_uart ();      break;
+    case S5: current = fsm_usb  ();      break;
+    case S6: current = fsm_clear();      break;
+    case S7: current = fsm_push ();      break;
+    case S8: current = fsm_send ();      break;
+    case S9: current = fsm_pop  ();      break;
 
     case UNDEFINED:
     case INDETERMINATE:
-      next = INDETERMINATE;
+      current = INDETERMINATE;
       break;
     }
-  current = fsm_adjust (next);
 }
 
 void fsm_request_state (fsm_state_t state)

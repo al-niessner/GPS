@@ -53,13 +53,13 @@ typedef enum { S0=0, S1, S2, S3, S4, S5, S6, S7, S8, S9,
 
 typedef enum
 {
-  READ_EEDATA_CMD        = 0x04,  // Read from the device EEPROM.
-  WRITE_EEDATA_CMD       = 0x05,  // Write to the device EEPROM.
+  READ_EEDATA_CMD   = 0x04,  // Read from the device EEPROM.
+  WRITE_EEDATA_CMD  = 0x05,  // Write to the device EEPROM.
 
-  GPS_VER_CMD            = 0x80,  // Get the version of the GPS firmware
-  GPS_REQUEST_CMD        = 0x81,
-
-  RESET_CMD              = 0xff   // Cause a power-on reset.
+  GPS_VER_CMD       = 0x80,  // Get the version of the GPS firmware
+  GPS_REQUEST_CMD   = 0x81,  // Set the state
+  
+  RESET_CMD         = 0xff   // Cause a power-on reset.
 } usb_cmd_t;
 
 typedef struct usb_device_info
