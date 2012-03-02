@@ -147,6 +147,18 @@ fsm_state_t fsm_usb(void)
         case GPS_REQUEST_CMD:
           if (user_req.details.force) fsm_set_state (user_req.details.state);
           else fsm_request_state (user_req.details.state);
+
+          if (user_req.details.state == S2)
+            duration[0] = user_req.details.duration;
+
+          if (user_req.details.state == S3)
+            duration[1] = user_req.details.duration;
+
+          if (user_req.details.state == S6)
+            {
+              duration[0] = user_req.details.duration;
+              duration[1] = user_req.details.duration;
+            }
           break;
 
         default:
