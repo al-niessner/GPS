@@ -57,8 +57,9 @@ void usb_initialize(void)
   USBDeviceAttach();
 }
 
-void usb_process(void)
+bool_t usb_process (user_request_t *request)
 {
+  bool_t do_more = false;
   unsigned char len;
 
   if (fifo_fetch_usb (&usb_inbound, &len))
@@ -71,6 +72,14 @@ void usb_process(void)
       num_return_bytes = 0;  // Initially, assume nothing needs to be returned
       switch (usb_inbound.cmd)
         {
+        case GPS_REQUEST_CMD:
+          do_more = true;
+          request->command          = usb_inbound.cmd;
+          request->details.duration = usb_inbound.duration;
+          request->details.force    = usb_inbound.force;
+          request->details.state    = usb_inbound.new_state;
+          break;
+
         case GPS_VER_CMD:
           // Return a packet with information about this USB interface device.
           usb_outbound.cmd = cmd;
@@ -114,8 +123,10 @@ void usb_process(void)
           break;
         } /* switch */
 
-      if (num_return_bytes != 0U)
+      if (num_return_bytes != 0u)
         fifo_push_usb (&usb_outbound, num_return_bytes);
     }
+
+  return do_more;
 }
 

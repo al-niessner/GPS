@@ -23,9 +23,10 @@
 #ifndef GPS_USB_H
 #define GPS_USB_H
 
+#include "memory.h"
 
-void usb_handle(void);
-void usb_initialize(void);
-void usb_process(void);
+void   usb_handle(void);
+void   usb_initialize(void);
+bool_t usb_process (user_request_t *request);
 
 #endif

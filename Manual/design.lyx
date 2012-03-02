@@ -2049,7 +2049,7 @@ The FIFO has become a critical design element because it now has to foster
 \end_layout
 
 \begin_layout Standard
-The software is divided into eight logical components as shown in Figure
+The software is divided into seven logical components as shown in Figure
  
 \begin_inset CommandInset ref
 LatexCommand vref
@@ -2065,10 +2065,6 @@ reference "fig:Firware-Dependency"
  The RAM and ROM versions are for the different memory regions while the
  types simply defines the various types contained in RAM and ROM.
  The file name to software modules is:
-\end_layout
-
-\begin_layout Description
-contexts contexts.{c,h}
 \end_layout
 
 \begin_layout Description

@@ -93,3 +93,11 @@ void   fifo_push_usb (usb_data_packet_t *item, unsigned char len)
       while (USBHandleBusy (usb_out_h[usb_out_idx])) {}
     }
 }
+
+bool_t fifo_waiting_usb(void)
+{
+  bool_t ready = ((USBGetDeviceState() < CONFIGURED_STATE) ||
+                  USBIsDeviceSuspended()                   ||
+                  USBHandleBusy (usb_in_h[usb_in_idx]));
+  return ready;
+}
