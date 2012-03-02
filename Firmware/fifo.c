@@ -25,10 +25,36 @@
 
 #include "fifo.h"
 
+#pragma udata
+
+static fsm_state_t state_c, state_n, state_request, state_require;
+
 #pragma code
 
 void   fifo_initialize(void)
 {
+  state_c       = UNDEFINED;
+  state_n       = UNDEFINED;
+  state_request = UNDEFINED;
+  state_require = UNDEFINED;
+}
+
+void fifo_pop_state  (fsm_state_t *current, fsm_state_t *next,
+                      fsm_state_t *requested, fsm_state_t *required)
+{
+  *current   = state_c;
+  *next      = state_n;
+  *requested = state_request;
+  *required  = state_require;
+}
+
+void fifo_push_state (fsm_state_t current, fsm_state_t next,
+                      fsm_state_t requested, fsm_state_t required)
+{
+  if (current != UNDEFINED) state_c = current;
+  if (next != UNDEFINED)    state_n = next;
+  state_request = requested;
+  state_require = required;
 }
 
 bool_t fifo_fetch_time_event(button_event_t *button) { return false; }

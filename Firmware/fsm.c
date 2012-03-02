@@ -192,7 +192,9 @@ void fsm_initialize(void)
 
 void fsm_process (void)
 {
-  switch (fsm_adjust (current))
+  current = fsm_adjust (current);
+  fifo_push_state (current, UNDEFINED, requested, required);
+  switch (current)
     {
     case S0: current = fsm_idle (false); break;
     case S1: current = fsm_idle (true);  break;
@@ -210,6 +212,7 @@ void fsm_process (void)
       current = INDETERMINATE;
       break;
     }
+  fifo_push_state (UNDEFINED, current, requested, required);
 }
 
 void fsm_request_state (fsm_state_t state)

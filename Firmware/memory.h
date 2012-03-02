@@ -58,7 +58,8 @@ typedef enum
 
   GPS_VER_CMD       = 0x80,  // Get the version of the GPS firmware
   GPS_REQUEST_CMD   = 0x81,  // Set the state
-  
+  GPS_STATE_REQ     = 0x82,  // Get the current and next state and timing
+
   RESET_CMD         = 0xff   // Cause a power-on reset.
 } usb_cmd_t;
 
@@ -81,12 +82,21 @@ typedef union usb_data_packet
     usb_device_info_t info;
   };
 
-  struct // GPS request
+  struct // GPS_REQUEST_CMD
   {
     usb_cmd_t cmd;
     unsigned char new_state;
     bool_t force;
     unsigned int duration;
+    unsigned char data[USBGEN_EP_SIZE - 5];
+  };
+
+  struct // GPS_STATE_REQ
+  {
+    usb_cmd_t cmd;
+    fsm_state_t current;
+    fsm_state_t next;
+    unsigned int timing;
     unsigned char data[USBGEN_EP_SIZE - 5];
   };
 

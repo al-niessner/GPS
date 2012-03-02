@@ -28,6 +28,11 @@
 void   fifo_initialize(void);
 void   fifo_initialize_usb(void);
 
+void fifo_pop_state  (fsm_state_t *current, fsm_state_t *next,
+                      fsm_state_t *requested, fsm_state_t *required);
+void fifo_push_state (fsm_state_t current, fsm_state_t next,
+                      fsm_state_t requested, fsm_state_t required);
+
 bool_t fifo_fetch_time_event(button_event_t *button); // array of 2
 void   fifo_push_time_event(button_event_t *button); // array of 2
 
