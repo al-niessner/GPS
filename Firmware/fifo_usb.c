@@ -58,14 +58,14 @@ void   fifo_initialize_usb(void)
 
 bool_t fifo_fetch_usb (usb_data_packet_t *result, unsigned char *len)
 {
-  bool_t ready = ((USBGetDeviceState() < CONFIGURED_STATE) ||
-                  USBIsDeviceSuspended()                   ||
-                  USBHandleBusy (usb_in_h[usb_in_idx]));
+  bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
+                   USBIsDeviceSuspended()                   ||
+                   USBHandleBusy (usb_in_h[usb_in_idx]));
 
   if (ready)
     {
       *len =  USBHandleGetLength (usb_in_h[usb_in_idx]);
-      memcpy ((void*)&usb_in[usb_in_idx], (void*)result, *len);
+      memcpy ((void*)result, (void*)&usb_in[usb_in_idx], *len);
       usb_in_h[usb_in_idx] =  USBGenRead (USBGEN_EP_NUM,
                                           (unsigned char*)&usb_in[usb_in_idx],
                                           USBGEN_EP_SIZE);
@@ -79,12 +79,9 @@ void   fifo_push_usb (usb_data_packet_t *item, unsigned char len)
 {
   unsigned char idx;
 
-  if (len != 0u && len <= USBGEN_EP_NUM)
+  if (0u < len && len <= USBGEN_EP_SIZE)
     {
-      for (idx = 0 ; idx < len ; idx++)
-        {
-          usb_out[usb_out_idx]._byte[idx] = item->_byte[idx];
-        }
+      memcpy (&usb_out[usb_out_idx], item, len);
       usb_out_h[usb_out_idx] =
         USBGenWrite (USBGEN_EP_NUM,
                      (unsigned char*)&usb_out[usb_out_idx],
@@ -96,8 +93,8 @@ void   fifo_push_usb (usb_data_packet_t *item, unsigned char len)
 
 bool_t fifo_waiting_usb(void)
 {
-  bool_t ready = ((USBGetDeviceState() < CONFIGURED_STATE) ||
-                  USBIsDeviceSuspended()                   ||
-                  USBHandleBusy (usb_in_h[usb_in_idx]));
+  bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
+                   USBIsDeviceSuspended()                   ||
+                   USBHandleBusy (usb_in_h[usb_in_idx]));
   return ready;
 }

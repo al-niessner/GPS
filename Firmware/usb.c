@@ -43,6 +43,7 @@ static const rom usb_device_info_t usb_dev_info =
 
 static usb_data_packet_t usb_inbound;
 static usb_data_packet_t usb_outbound;
+volatile  unsigned long int delay;
 
 #pragma code
 
@@ -66,7 +67,6 @@ bool_t usb_process (user_request_t *request)
     {
       unsigned char buffer_cntr;
       unsigned char num_return_bytes; // Number of bytes to return in response
-      unsigned char cmd;              // Store the command in the rcved packet
       unsigned int  lcntr;
       
       num_return_bytes = 0;  // Initially, assume nothing needs to be returned
@@ -82,7 +82,7 @@ bool_t usb_process (user_request_t *request)
 
         case GPS_VER_CMD:
           // Return a packet with information about this USB interface device.
-          usb_outbound.cmd = cmd;
+          usb_outbound.cmd = usb_inbound.cmd;
           memcpypgm2ram (&usb_outbound.info,
                          &usb_dev_info,
                          sizeof (usb_device_info_t));
@@ -123,8 +123,7 @@ bool_t usb_process (user_request_t *request)
           break;
         } /* switch */
 
-      if (num_return_bytes != 0u)
-        fifo_push_usb (&usb_outbound, num_return_bytes);
+      fifo_push_usb (&usb_outbound, num_return_bytes);
     }
 
   return do_more;
