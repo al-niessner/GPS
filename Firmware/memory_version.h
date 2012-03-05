@@ -24,7 +24,7 @@
 #define GPS_MAIN_VERSION
 
 #define GPS_MAJOR_VERSION  2u
-#define GPS_MINOR_VERSION  2u
-#define GPS_BUGFIX_VERSION 1u
+#define GPS_MINOR_VERSION  3u
+#define GPS_BUGFIX_VERSION 0u
 
 #endif

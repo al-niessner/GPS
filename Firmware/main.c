@@ -62,10 +62,14 @@ void Remapped_Low_ISR( void )
 
 void main(void)
 {
+  fsm_state_t c, n, m, r;
+
   main_initialize();
   while (true)
     {
       fsm_process();
+      fifo_pop_state (&c, &n, &m, &r);
+      fifo_broadcast_state_usb (c, n, m, r, 0u);
     }
 }
 

@@ -44,6 +44,7 @@ void   fifo_initialize_usb(void)
   USBEnableEndpoint (USBGEN_EP_NUM,
                      USB_OUT_ENABLED | USB_IN_ENABLED |
                      USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
+
   // Now begin waiting for the first packets to be received from the host
   usb_in_idx = 0;
   usb_in_h[0] = USBGenRead (USBGEN_EP_NUM,
@@ -54,6 +55,34 @@ void   fifo_initialize_usb(void)
                             USBGEN_EP_SIZE);
   // Initialize the pointer to the buffer which will return data to the host
   usb_out_idx = 0;
+}
+
+void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
+                                 fsm_state_t requested, fsm_state_t required,
+                                 unsigned int timing)
+{
+  bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
+                   USBIsDeviceSuspended()                   ||
+                   USBHandleBusy (usb_in_h[usb_in_idx]));
+
+  if (ready) ready = usb_in[usb_in_idx].cmd == GPS_STATE_REQ;
+
+  if (ready)
+    {
+      usb_data_packet_t item;
+
+      usb_in_h[usb_in_idx] =  USBGenRead (USBGEN_EP_NUM,
+                                          (unsigned char*)&usb_in[usb_in_idx],
+                                          USBGEN_EP_SIZE);
+      usb_in_idx ^= 1;
+      item.cmd = GPS_STATE_REQ;
+      item.current = current;
+      item.next = next;
+      item.requested = requested;
+      item.required = required;
+      item.timing = timing;
+      fifo_push_usb (&item, 7);
+    }
 }
 
 bool_t fifo_fetch_usb (usb_data_packet_t *result, unsigned char *len)
@@ -96,5 +125,8 @@ bool_t fifo_waiting_usb(void)
   bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
                    USBIsDeviceSuspended()                   ||
                    USBHandleBusy (usb_in_h[usb_in_idx]));
+
+  if (ready) ready = usb_in[usb_in_idx].cmd != GPS_STATE_REQ;
+
   return ready;
 }
