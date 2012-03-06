@@ -66,18 +66,28 @@ void Remapped_Low_ISR( void )
 void main(void)
 {
   fsm_state_t c, n, m, r;
-  unsigned int cost, last, now;
+  unsigned int ltc, mid, tc;
+  unsigned long int cost, last, now;
 
   last = 0u;
+  ltc = 0u;
   main_initialize();
   while (true)
     {
-      now = timer_counter;
+      tc = timer_counter;
+      now = tc;
+      mid = TMR3H;
+      now = (now << 16) | (mid << 8) | TMR3L; // shifts are in place
 
-      if (last <= now) cost = now - last;
-      else cost = 0xffff - last + now + 1;
+      if (now < last) 
+        {
+          if (tc == ltc) cost = 0x00010000;
+          else cost = (0xffffffff - last) + now + 1;
+        }
+      else cost = now - last;
 
       last = now;
+      ltc = tc;
       fifo_pop_state (&c, &n, &m, &r);
       fifo_broadcast_state_usb (c, n, m, r, cost);
       fsm_process();
@@ -136,6 +146,9 @@ void main_lpi(void)
 {
   if (PIR2bits.TMR3IF) // interrupt is from the timer to generate time events
     {
+      // preload the counter for a 64 Hz rate. 45 Hz is the slowest.
+      TMR3H = 0x49;
+      TMR3L = 0x62;
       PIR2bits.TMR3IF = 0;
       timer_counter++;
     }

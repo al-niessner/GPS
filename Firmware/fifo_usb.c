@@ -59,7 +59,7 @@ void   fifo_initialize_usb(void)
 
 void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
                                  fsm_state_t requested, fsm_state_t required,
-                                 unsigned int timing)
+                                 unsigned long int timing)
 {
   bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
                    USBIsDeviceSuspended()                   ||
@@ -81,7 +81,7 @@ void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
       item.requested = requested;
       item.required = required;
       item.timing = timing;
-      fifo_push_usb (&item, 7);
+      fifo_push_usb (&item, 9);
     }
 }
 

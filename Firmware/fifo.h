@@ -38,7 +38,7 @@ void   fifo_push_time_event(button_event_t *button); // array of 2
 
 void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
                                  fsm_state_t requested, fsm_state_t required,
-                                 unsigned int timing);
+                                 unsigned long int timing);
 bool_t fifo_fetch_usb (usb_data_packet_t *to_be_filled, unsigned char *len);
 void   fifo_push_usb (usb_data_packet_t *to_be_emptied, unsigned char len);
 bool_t fifo_waiting_usb(void); // returns true if there is a message waiting to be processed

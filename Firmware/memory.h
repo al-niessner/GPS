@@ -98,8 +98,8 @@ typedef union usb_data_packet
     fsm_state_t next;
     fsm_state_t requested;
     fsm_state_t required;
-    unsigned int timing;
-    unsigned char data[USBGEN_EP_SIZE - 7];
+    unsigned long int timing;
+    unsigned char data[USBGEN_EP_SIZE - 9];
   };
 
   struct // EEPROM read/write structure
