@@ -20,7 +20,7 @@
  *
  *********************************************************************/
 
-#include <USB/usb.h>
+#include <Compiler.h>
 
 #include "fifo.h"
 #include "fsm.h"
@@ -36,6 +36,9 @@
 void main_hpi(void);
 void main_initialize(void);
 void main_lpi(void);
+
+#pragma udata
+static unsigned int timer_counter;
 
 #pragma code REMAPPED_RESET_VECTOR = REMAPPED_RESET_VECTOR_ADDRESS
 extern void _startup( void );        // See c018i.c in your C18 compiler dir
@@ -63,13 +66,21 @@ void Remapped_Low_ISR( void )
 void main(void)
 {
   fsm_state_t c, n, m, r;
+  unsigned int cost, last, now;
 
+  last = 0u;
   main_initialize();
   while (true)
     {
-      fsm_process();
+      now = timer_counter;
+
+      if (last <= now) cost = now - last;
+      else cost = 0xffff - last + now + 1;
+
+      last = now;
       fifo_pop_state (&c, &n, &m, &r);
-      fifo_broadcast_state_usb (c, n, m, r, 0u);
+      fifo_broadcast_state_usb (c, n, m, r, cost);
+      fsm_process();
     }
 }
 
@@ -93,6 +104,13 @@ void main_initialize(void)
   INIT_GPIO3();
   INIT_LED();
 
+  // Initialize the timer
+  T3CON            = 0b00000000;  // 12 MHz clock input to TIMER3 and disabled.
+  IPR2bits.TMR3IP  = 0;   // Make TIMER3 overflow a low-priority interrupt.
+  PIR2bits.TMR3IF  = 0;   // Clear TIMER3 interrupt flag.
+  PIE2bits.TMR3IE  = 1;   // Enable TIMER3 interrupt.
+  T3CONbits.TMR3ON = 1;   // Enable TIMER3.
+  
   #if defined( USE_USB_BUS_SENSE_IO )
   tris_usb_bus_sense = INPUT_PIN;
   #endif
@@ -102,9 +120,9 @@ void main_initialize(void)
   fifo_initialize();
 
   // interrupts are on
-  RCONbits.IPEN   = 1;      // Enable prioritized interrupts.
-  INTCONbits.GIEH = 1;
-  INTCONbits.GIEL = 1;
+  RCONbits.IPEN   = 1; // Enable prioritized interrupts.
+  INTCONbits.GIEH = 1; // Enable high priority interrupts
+  INTCONbits.GIEL = 1; // Enable low priority interrupts
 }
 
 #pragma interrupt main_hpi
@@ -116,5 +134,10 @@ void main_hpi(void)
 #pragma interruptlow main_lpi
 void main_lpi(void)
 {
+  if (PIR2bits.TMR3IF) // interrupt is from the timer to generate time events
+    {
+      PIR2bits.TMR3IF = 0;
+      timer_counter++;
+    }
 }
 

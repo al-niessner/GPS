@@ -24,11 +24,22 @@
  *
  *********************************************************************/
 
-#ifndef GPS_SDCARD_H
-#define GPS_SDCARD_H
+#pragma code
 
-void          sdcard_erase(void);
-void          sdcard_initialize(void);
-unsigned char sdcard_read (unsigned char *s, unsigned char len);
-void          sdcard_write (unsigned char *s, unsigned char len);
-#endif
+void          sdcard_erase(void)
+{
+}
+
+void          sdcard_initialize(void)
+{
+}
+
+unsigned char sdcard_read (unsigned char *s, unsigned char len)
+{
+  unsigned char result = 0u;
+  return result;
+}
+
+void          sdcard_write (unsigned char *s, unsigned char len)
+{
+}

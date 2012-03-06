@@ -25,6 +25,7 @@
 #include "fifo.h"
 #include "fsm.h"
 #include "HardwareProfile.h"
+#include "sdcard.h"
 #include "usb.h"
 
 #pragma udata
@@ -62,7 +63,9 @@ fsm_state_t fsm_clear(void)
   if (duration[0] == 3u && duration[1] == 3u)
     {
       LED_ON();
-      // TODO: erase SD memory card
+      fifo_set_allow (false);
+      fifo_set_valid (false);
+      sdcard_erase();
     }
 
   return S0;
