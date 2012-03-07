@@ -23,7 +23,7 @@
 #ifndef GPS_MEMORY_H
 #define GPS_MEMORY_H
 
-typedef enum { false=0==1, true=0==0 } bool_t;
+typedef enum { false=0==1, true=0==0, SD1=0x90, SD2=0xa0, SD3=0xb0 } bool_t;
 
 /**
  * Time Event
@@ -94,12 +94,14 @@ typedef union usb_data_packet
   struct // GPS_STATE_REQ
   {
     usb_cmd_t cmd;
+    unsigned char my_true;
     fsm_state_t current;
     fsm_state_t next;
     fsm_state_t requested;
     fsm_state_t required;
     unsigned long int timing;
-    unsigned char data[USBGEN_EP_SIZE - 9];
+    unsigned char sdcard_init;
+    unsigned char data[USBGEN_EP_SIZE - 11];
   };
 
   struct // EEPROM read/write structure

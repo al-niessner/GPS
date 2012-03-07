@@ -59,7 +59,7 @@ void   fifo_initialize_usb(void)
 
 void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
                                  fsm_state_t requested, fsm_state_t required,
-                                 unsigned long int timing)
+                                 unsigned long int timing, bool_t sd_init)
 {
   bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
                    USBIsDeviceSuspended()                   ||
@@ -76,12 +76,14 @@ void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
                                           USBGEN_EP_SIZE);
       usb_in_idx ^= 1;
       item.cmd = GPS_STATE_REQ;
+      item.my_true = true;
       item.current = current;
       item.next = next;
       item.requested = requested;
       item.required = required;
       item.timing = timing;
-      fifo_push_usb (&item, 9);
+      item.sdcard_init = sd_init;
+      fifo_push_usb (&item, 11);
     }
 }
 
@@ -94,7 +96,7 @@ bool_t fifo_fetch_usb (usb_data_packet_t *result, unsigned char *len)
   if (ready)
     {
       *len =  USBHandleGetLength (usb_in_h[usb_in_idx]);
-      memcpy ((void*)result, (void*)&usb_in[usb_in_idx], *len);
+      memcpy ((void*)result, (const void*)&usb_in[usb_in_idx], *len);
       usb_in_h[usb_in_idx] =  USBGenRead (USBGEN_EP_NUM,
                                           (unsigned char*)&usb_in[usb_in_idx],
                                           USBGEN_EP_SIZE);

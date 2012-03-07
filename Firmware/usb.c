@@ -83,8 +83,8 @@ bool_t usb_process (user_request_t *request)
         case GPS_VER_CMD:
           // Return a packet with information about this USB interface device.
           usb_outbound.cmd = usb_inbound.cmd;
-          memcpypgm2ram (&usb_outbound.info,
-                         &usb_dev_info,
+          memcpypgm2ram ((void*)&usb_outbound.info,
+                         (const rom void*)&usb_dev_info,
                          sizeof (usb_device_info_t));
           num_return_bytes  = sizeof (usb_device_info_t) + 1;
           break;

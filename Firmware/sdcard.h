@@ -27,8 +27,10 @@
 #ifndef GPS_SDCARD_H
 #define GPS_SDCARD_H
 
+#include "memory.h"
+
 void          sdcard_erase(void);
-void          sdcard_initialize(void);
+bool_t        sdcard_initialize(void);
 unsigned char sdcard_read (unsigned char *s, unsigned char len);
 void          sdcard_write (unsigned char *s, unsigned char len);
 #endif

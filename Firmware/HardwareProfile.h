@@ -137,7 +137,6 @@
 #define RX_ASM          PORT_ASM( B, 5 )
 #define INIT_RX()       RX = 0, RX_TRIS = INPUT_PIN
 
-#if 1
 /** SD CARD CHIP-SELECT **********************************************/
 #define SD_CS_PORT      C
 #define SD_CS_BIT       6
@@ -177,49 +176,6 @@
 #define SD_MISO         PORT( B, 4 )
 #define SD_MISO_ASM     PORT_ASM( B, 4 )
 #define SD_MISO_INIT()  SD_MISO = 1, SD_MISO_TRIS = INPUT_PIN
-
-#else
-/** SD CARD CHIP-SELECT **********************************************/
-#define SD_CS_PORT      C
-#define SD_CS_BIT       2
-#define SD_CS_MASK      (1 << SD_CS_BIT)
-#define SD_CS_TRIS      TRIS( C, 2 )
-#define SD_CS_DIR       SD_CS_TRIS
-#define SD_CS           LATCH( C, 2 )
-#define SD_CS_ASM       PORT_ASM( C, 2 )
-#define SD_CS_INIT()    SD_CS = 1, SD_CS_TRIS = OUTPUT_PIN
-
-/** SD CARD CLK ******************************************************/
-#define SD_CLK_PORT      C
-#define SD_CLK_BIT       0
-#define SD_CLK_MASK      (1 << SD_CLK_BIT)
-#define SD_CLK_TRIS      TRIS( C, 0 )
-#define SD_CLK_DIR       SD_CLK_TRIS
-#define SD_CLK           LATCH( C, 0 )
-#define SD_CLK_ASM       PORT_ASM( C, 0 )
-#define SD_CLK_INIT()    SD_CLK = 0, SD_CLK_TRIS = OUTPUT_PIN
-
-/** SD CARD MOSI *****************************************************/
-#define SD_MOSI_PORT    C
-#define SD_MOSI_BIT     1
-#define SD_MOSI_MASK    (1 << SD_MOSI_BIT)
-#define SD_MOSI_TRIS    TRIS( C, 1 )
-#define SD_MOSI_DIR     SD_MOSI_TRIS
-#define SD_MOSI         LATCH( C, 1 )
-#define SD_MOSI_ASM     PORT_ASM( C, 1 )
-#define SD_MOSI_INIT()  SD_MOSI = 0, SD_MOSI_TRIS = OUTPUT_PIN
-
-/** SD CARD MISO *****************************************************/
-#define SD_MISO_PORT    C
-#define SD_MISO_BIT     3
-#define SD_MISO_MASK    (1 << SD_MISO_BIT)
-#define SD_MISO_TRIS    TRIS( C, 3 )
-#define SD_MISO_DIR     SD_MISO_TRIS
-#define SD_MISO         PORT( C, 3 )
-#define SD_MISO_ASM     PORT_ASM( C, 3 )
-#define SD_MISO_INIT()  SD_MISO = 1, SD_MISO_TRIS = INPUT_PIN
-
-#endif
 
 /** Some common uC bits ********************************************/
 // ALU carry bit.

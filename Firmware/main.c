@@ -26,6 +26,7 @@
 #include "fsm.h"
 #include "HardwareProfile.h"
 #include "memory.h"
+#include "sdcard.h"
 #include "usb.h"
 
 /** VECTOR REMAPPING *******************************************/
@@ -38,6 +39,7 @@ void main_initialize(void);
 void main_lpi(void);
 
 #pragma udata
+static bool_t main_sd_init;
 static unsigned int timer_counter;
 
 #pragma code REMAPPED_RESET_VECTOR = REMAPPED_RESET_VECTOR_ADDRESS
@@ -89,7 +91,7 @@ void main(void)
       last = now;
       ltc = tc;
       fifo_pop_state (&c, &n, &m, &r);
-      fifo_broadcast_state_usb (c, n, m, r, cost);
+      fifo_broadcast_state_usb (c, n, m, r, cost, main_sd_init);
       fsm_process();
     }
 }
@@ -126,9 +128,10 @@ void main_initialize(void)
   #endif
 
   fsm_initialize();
+  main_sd_init = sdcard_initialize();
   usb_initialize();
   fifo_initialize();
-
+  
   // interrupts are on
   RCONbits.IPEN   = 1; // Enable prioritized interrupts.
   INTCONbits.GIEH = 1; // Enable high priority interrupts
