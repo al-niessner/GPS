@@ -26,6 +26,20 @@
 typedef enum { false=0==1, true=0==0 } bool_t;
 
 /**
+  * FSM Types
+  *
+  * fsm_state_t states S0..S9 inclusive are defined in the design documenation.
+  * The states UNDEFINED and INDETERMINATE are implementation additions to help
+  * detect errors in the FSM engine. UNDEFINED is used to mark a variable as
+  * not being set. This is helpful for when the user sends or does not send a
+  * state request or demand. INDETERMINATE means that the engine made a mistake
+  * somewhere along the way and the FSM is now in a bad state.
+ **/
+
+typedef enum { S0=0, S1, S2, S3, S4, S5, S6, S7, S8, S9,
+               UNDEFINED=0xfe, INDETERMINATE=0xff } fsm_state_t;
+
+/**
   * SD Card interface
  **/
 
@@ -43,25 +57,18 @@ typedef enum { SD_POWER_UP=0x00, // device is turned on
                SD_INIT_DONE_SDSH_X=0xc0
 } sdcard_init_step_t;
 
+typedef struct sd_mbr
+{
+  unsigned long int  last_read;
+  unsigned long int  last_write;
+  unsigned short int crc16;
+} sd_mbr_t;
+
 /**
   * Time Event
 **/
 
 typedef enum { FALLING_EDGE, RISING_EDGE, SS_HIGH, SS_LOW } button_event_t;
-/**
-  * FSM Types
-  *
-  * fsm_state_t states S0..S9 inclusive are defined in the design documenation.
-  * The states UNDEFINED and INDETERMINATE are implementation additions to help
-  * detect errors in the FSM engine. UNDEFINED is used to mark a variable as
-  * not being set. This is helpful for when the user sends or does not send a
-  * state request or demand. INDETERMINATE means that the engine made a mistake
-  * somewhere along the way and the FSM is now in a bad state.
- **/
-
-typedef enum { S0=0, S1, S2, S3, S4, S5, S6, S7, S8, S9,
-               UNDEFINED=0xfe, INDETERMINATE=0xff } fsm_state_t;
-
 
 /**
   * USB Types
@@ -77,6 +84,7 @@ typedef enum
   GPS_VER_CMD       = 0x80,  // Get the version of the GPS firmware
   GPS_REQUEST_CMD   = 0x81,  // Set the state
   GPS_STATE_REQ     = 0x82,  // Get the current and next state and timing
+  GPS_SDC_STATE_REQ = 0x83,  // Get the status, CDS, and CIS from the SD Card
 
   RESET_CMD         = 0xff   // Cause a power-on reset.
 } usb_cmd_t;
@@ -122,6 +130,13 @@ typedef union usb_data_packet
     unsigned char last_r1;
     unsigned char sdcard_version;
     unsigned char unused_req[USBGEN_EP_SIZE - 13];
+  };
+
+  struct // GPS_SDC_STATE_REQ
+  {
+    unsigned int status;
+    unsigned char cid[15];
+    unsigned char csd[15];
   };
 
   struct // EEPROM read/write structure

@@ -39,6 +39,10 @@ void main_initialize(void);
 void main_lpi(void);
 
 #pragma udata
+static fsm_state_t c, n, m, r;
+static unsigned int ltc, mid, tc;
+static unsigned long int cost, last, now;
+
 static unsigned int timer_counter;
 
 #pragma code REMAPPED_RESET_VECTOR = REMAPPED_RESET_VECTOR_ADDRESS
@@ -66,10 +70,6 @@ void Remapped_Low_ISR( void )
 
 void main(void)
 {
-  fsm_state_t c, n, m, r;
-  unsigned int ltc, mid, tc;
-  unsigned long int cost, last, now;
-
   last = 0u;
   ltc = 0u;
   main_initialize();

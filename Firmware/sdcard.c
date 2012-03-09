@@ -33,7 +33,11 @@
 
 typedef enum { SD_GO_IDLE_STATE    = 0x40,// CMD0   0x00
                SD_SEND_IF_COND     = 0x48,// CMD8
+               SD_SEND_CSD         = 0x49,// CMD9
+               SD_SEND_CID         = 0x4a,// CMD10
+               SD_SEND_STATUS      = 0x4d,// CMD13
                SD_SET_BLOCKLEN     = 0x50,// CMD16
+               SD_READ_BLOCK       = 0x51,// CMD17
                SD_APP_CMD          = 0x77,// CMD55
                SD_READ_OCR         = 0x7a,// CMD58
                SD_APP_SEND_OP_COND = 0x69,// ACMD41 0x29
@@ -94,6 +98,7 @@ typedef union
 
 #pragma udata
 
+static sd_response_t reply;
 static unsigned char version;
 static unsigned char cid[16];
 static unsigned char csd[16];
@@ -116,20 +121,28 @@ unsigned char sdcard_crc7 (unsigned char data, unsigned char prev)
   return crc;
 }
 
-// length is determined from command.
-sd_response_t sdcard_block (sd_command_t c, unsigned char *block)
-{
-  sd_response_t result;
+unsigned int sdcard_crc16 (unsigned char data, unsigned int crc) 
+{ 
+  unsigned int x;
 
-  return result;
+  x = (crc >> 8) & 0x00ff;
+  x = x ^ data;
+  x = x ^ (x >> 4); 
+  crc = (crc << 8) ^ ((x << 8) << 4) ^ ((x << 4) << 1) ^ x; 
+
+  return crc; 
 }
 
-sd_response_t sdcard_process (sd_command_t c,
-                              unsigned long int arg,
-                              sd_response_name_t r)
+// length is determined from command.
+void sdcard_block (sd_command_t c, unsigned char *block)
+{
+}
+
+void sdcard_process (sd_command_t c,
+                     unsigned long int arg,
+                     sd_response_name_t r)
 {
   unsigned char crc,data,i,j,n;
-  sd_response_t result;
 
   SD_CS = 0;
   putcSPI (c);
@@ -148,7 +161,7 @@ sd_response_t sdcard_process (sd_command_t c,
   crc = sdcard_crc7 (data, crc);
   crc = (crc << 1) | 1;
   putcSPI (crc);
-  for (i = 0 ; i < 5u ;  i++) result.val[i] = SD_NULL;
+  for (i = 0 ; i < 5u ;  i++) reply.val[i] = SD_NULL;
   switch (r)
     {
     case R1:
@@ -165,14 +178,14 @@ sd_response_t sdcard_process (sd_command_t c,
       n = 5;
       break;
     }
-  for (i = 0x09 ; i && result.val[0] == SD_NULL ; i--) //Ncr delay
+  for (i = 0x09 ; i && reply.val[0] == SD_NULL ; i--) //Ncr delay
     {
       putcSPI (SD_NULL); // keep sclk moving
-      result.val[0] = getcSPI();
+      reply.val[0] = getcSPI();
     }
   for (j = 1 ; j < n ; j++)
     {
-      result.val[j] = getcSPI();
+      reply.val[j] = getcSPI();
     }
 
   if (r == R1b)
@@ -182,7 +195,6 @@ sd_response_t sdcard_process (sd_command_t c,
     }
 
   SD_CS = 1;
-  return result;
 }
 
 void sdcard_erase(void)
@@ -191,11 +203,15 @@ void sdcard_erase(void)
 
 unsigned char *sdcard_get_CID(void) { return cid; }
 unsigned char *sdcard_get_CSD(void) { return csd; }
+unsigned int sdcard_get_status(void)
+{
+  sdcard_process (SD_SEND_STATUS, 0x0u, R2);
+  return reply.r2_val;
+}
 
 void sdcard_initialize(void)
 {
   bool_t sdsc;
-  sd_response_t reply;
   unsigned char i;
   unsigned long int acmd41_arg;
 
@@ -213,15 +229,15 @@ void sdcard_initialize(void)
   fifo_broadcast_sdcard_usb (SD_POWER_UP, 0x00u, version);
 
   // put the sdcard into idle SPI mode
-  reply = sdcard_process (SD_GO_IDLE_STATE, 0u, R1);
+  sdcard_process (SD_GO_IDLE_STATE, 0u, R1);
   fifo_broadcast_sdcard_usb (SD_SPI_MODE, reply.val[0], reply.val[1]);
 
   if (reply.val[0] == 0x01u)
     {
-      reply = sdcard_process (SD_SEND_IF_COND, 0x000001aau, R7);
+      sdcard_process (SD_SEND_IF_COND, 0x000001aau, R7);
       fifo_broadcast_sdcard_usb (SD_VOLT_CHK, reply.val[0], version);
 
-      if (reply.r1.illegal_cmd && reply.val[0] != 0xff) version = 1;
+      if (reply.r1.illegal_cmd && (reply.val[0] & 0xfa) == 0x00u) version = 1;
       else if (reply.val[0] == 0x01u)
         {
           acmd41_arg = 0x40000000;
@@ -246,16 +262,16 @@ void sdcard_initialize(void)
       fifo_broadcast_sdcard_usb (SD_CLK_RATE, 0x00u, version);
 
       // tell the sdcard to initialize
-      reply = sdcard_process (SD_APP_CMD, 0x00u, R1);
-      reply = sdcard_process (SD_APP_SEND_OP_COND, acmd41_arg, R1);
+      sdcard_process (SD_APP_CMD, 0x00u, R1);
+      sdcard_process (SD_APP_SEND_OP_COND, acmd41_arg, R1);
       fifo_broadcast_sdcard_usb (SD_INIT_SCD, reply.val[0], version);
 
       if ((reply.val[0] & 0xfe) != 0x00u) return;
 
       while (reply.val[0] == 0x01u)
         {
-          reply = sdcard_process (SD_APP_CMD, 0x00u, R1);
-          reply = sdcard_process (SD_APP_SEND_OP_COND, acmd41_arg, R1);
+          sdcard_process (SD_APP_CMD, 0x00u, R1);
+          sdcard_process (SD_APP_SEND_OP_COND, acmd41_arg, R1);
         }
       fifo_broadcast_sdcard_usb (SD_WAIT_SCD, reply.val[0], version);
 
@@ -263,7 +279,7 @@ void sdcard_initialize(void)
 
       if (version == 2u)
         {
-          reply = sdcard_process (SD_READ_OCR, 0x00u, R3);
+          sdcard_process (SD_READ_OCR, 0x00u, R3);
           fifo_broadcast_sdcard_usb (SD_OCR_READ, reply.val[0], version);
           sdsc = 0u == (reply.val[1] & 0x40);
 
@@ -271,7 +287,7 @@ void sdcard_initialize(void)
         }
 
       // make all cards compatible since SDCH/X cards are fixed at 512 anyway
-      reply = sdcard_process (SD_SET_BLOCKLEN, 0x200, R1);
+      sdcard_process (SD_SET_BLOCKLEN, 0x200, R1);
       fifo_broadcast_sdcard_usb (sdsc ? SD_INIT_DONE_SDSC : SD_INIT_DONE_SDSH_X,
                                  reply.val[0], version);
     }

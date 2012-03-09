@@ -32,6 +32,7 @@
 void          sdcard_erase(void);
 unsigned char *sdcard_get_CID(void);
 unsigned char *sdcard_get_CSD(void);
+unsigned int  sdcard_get_status(void);
 void          sdcard_initialize(void);
 unsigned char sdcard_read (unsigned char *s, unsigned char len);
 void          sdcard_write (unsigned char *s, unsigned char len);

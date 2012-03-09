@@ -31,11 +31,12 @@ static usb_data_packet_t usb_out[2]; // buffers for sending packets from host
 static usb_data_packet_t usb_in[2];  // buffers for rcving packets to host
 
 #pragma udata
-static USB_HANDLE usb_in_h[2] = {0,0};   // endpoint handles rcving packets
-static USB_HANDLE usb_out_h[2]  = {0,0}; // endpoint handles sending packets
+static USB_HANDLE usb_in_h[2];   // endpoint handles rcving packets
+static USB_HANDLE usb_out_h[2]; // endpoint handles sending packets
 static unsigned char usb_in_idx;
 static unsigned char usb_out_idx;
 
+static bool_t ready;
 static sdcard_init_step_t last_step;
 static unsigned char last_r1, last_ver;
 
@@ -73,9 +74,9 @@ void fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
                                fsm_state_t requested, fsm_state_t required,
                                unsigned long int timing)
 {
-  bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
-                   USBIsDeviceSuspended()                   ||
-                   USBHandleBusy (usb_in_h[usb_in_idx]));
+  ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
+            USBIsDeviceSuspended()                   ||
+            USBHandleBusy (usb_in_h[usb_in_idx]));
 
   if (ready) ready = usb_in[usb_in_idx].cmd == GPS_STATE_REQ;
 
@@ -103,9 +104,9 @@ void fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
 
 bool_t fifo_fetch_usb (usb_data_packet_t *result, unsigned char *len)
 {
-  bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
-                   USBIsDeviceSuspended()                   ||
-                   USBHandleBusy (usb_in_h[usb_in_idx]));
+  ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
+            USBIsDeviceSuspended()                   ||
+            USBHandleBusy (usb_in_h[usb_in_idx]));
 
   if (ready)
     {
@@ -138,9 +139,9 @@ void   fifo_push_usb (usb_data_packet_t *item, unsigned char len)
 
 bool_t fifo_waiting_usb(void)
 {
-  bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
-                   USBIsDeviceSuspended()                   ||
-                   USBHandleBusy (usb_in_h[usb_in_idx]));
+  ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
+            USBIsDeviceSuspended()                   ||
+            USBHandleBusy (usb_in_h[usb_in_idx]));
 
   if (ready) ready = usb_in[usb_in_idx].cmd != GPS_STATE_REQ;
 

@@ -36,6 +36,7 @@ static fsm_state_t current   = INDETERMINATE,
                    required  = UNDEFINED;
 static unsigned int duration[2] = {0, 0};
 static user_request_t user_req;
+static usb_data_packet_t send_msg;
 
 #pragma code
 
@@ -142,7 +143,6 @@ fsm_state_t fsm_uart(void)
 
 fsm_state_t fsm_usb(void)
 {
-
   if (usb_process (&user_req))
     {
       switch (user_req.command)
@@ -162,6 +162,13 @@ fsm_state_t fsm_usb(void)
               duration[0] = user_req.details.duration;
               duration[1] = user_req.details.duration;
             }
+          break;
+
+        case GPS_SDC_STATE_REQ:
+          send_msg.status = sdcard_get_status();
+          memcpy (send_msg.cid, (const void*)sdcard_get_CID(), 15);
+          memcpy (send_msg.csd, (const void*)sdcard_get_CSD(), 15);
+          fifo_push_usb (&send_msg, USBGEN_EP_SIZE);
           break;
 
         default:
