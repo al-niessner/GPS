@@ -23,10 +23,28 @@
 #ifndef GPS_MEMORY_H
 #define GPS_MEMORY_H
 
-typedef enum { false=0==1, true=0==0, SD1=0x90, SD2=0xa0, SD3=0xb0 } bool_t;
+typedef enum { false=0==1, true=0==0 } bool_t;
 
 /**
- * Time Event
+  * SD Card interface
+ **/
+
+typedef enum { SD_POWER_UP=0x00, // device is turned on
+               SD_SPI_MODE=0x01, // attempted to enter SPI mode
+               SD_VOLT_CHK=0x02, // sent a SEND_IF_COND check volts
+               SD_VOLT_R00=0x03, // checked reply R1 if reported rev 2
+               SD_VOLT_R03=0x04, // checked reply V if reported rev 2
+               SD_VOLT_R04=0x05, // checked reply echo if reported rev 2
+               SD_CLK_RATE=0x06, // pick up the speed
+               SD_INIT_SCD=0x07, // sent APP_SEND_OP_COND to init HW
+               SD_WAIT_SCD=0x09, // waited for the card to finish
+               SD_OCR_READ=0x08, // read the OCR
+               SD_INIT_DONE_SDSC=0x80,
+               SD_INIT_DONE_SDSH_X=0xc0
+} sdcard_init_step_t;
+
+/**
+  * Time Event
 **/
 
 typedef enum { FALLING_EDGE, RISING_EDGE, SS_HIGH, SS_LOW } button_event_t;
@@ -100,8 +118,10 @@ typedef union usb_data_packet
     fsm_state_t requested;
     fsm_state_t required;
     unsigned long int timing;
-    unsigned char sdcard_init;
-    unsigned char data[USBGEN_EP_SIZE - 11];
+    sdcard_init_step_t sdcard_init;
+    unsigned char last_r1;
+    unsigned char sdcard_version;
+    unsigned char unused_req[USBGEN_EP_SIZE - 13];
   };
 
   struct // EEPROM read/write structure

@@ -36,6 +36,9 @@ static USB_HANDLE usb_out_h[2]  = {0,0}; // endpoint handles sending packets
 static unsigned char usb_in_idx;
 static unsigned char usb_out_idx;
 
+static sdcard_init_step_t last_step;
+static unsigned char last_r1, last_ver;
+
 #pragma code
 
 void   fifo_initialize_usb(void)
@@ -57,9 +60,18 @@ void   fifo_initialize_usb(void)
   usb_out_idx = 0;
 }
 
-void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
-                                 fsm_state_t requested, fsm_state_t required,
-                                 unsigned long int timing, bool_t sd_init)
+void fifo_broadcast_sdcard_usb (sdcard_init_step_t step,
+                                unsigned char r1,
+                                unsigned char ver)
+{
+  last_step = step;
+  last_r1 = r1;
+  last_ver = ver;
+}
+
+void fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
+                               fsm_state_t requested, fsm_state_t required,
+                               unsigned long int timing)
 {
   bool_t ready = !((USBGetDeviceState() < CONFIGURED_STATE) ||
                    USBIsDeviceSuspended()                   ||
@@ -82,8 +94,10 @@ void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
       item.requested = requested;
       item.required = required;
       item.timing = timing;
-      item.sdcard_init = sd_init;
-      fifo_push_usb (&item, 11);
+      item.sdcard_init = last_step;
+      item.last_r1 = last_r1;
+      item.sdcard_version = last_ver;
+      fifo_push_usb (&item, USBGEN_EP_SIZE - sizeof (item.unused_req));
     }
 }
 
