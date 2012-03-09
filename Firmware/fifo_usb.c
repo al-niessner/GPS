@@ -36,9 +36,9 @@ static USB_HANDLE usb_out_h[2]; // endpoint handles sending packets
 static unsigned char usb_in_idx;
 static unsigned char usb_out_idx;
 
-static bool_t ready;
+static bool_t ready, sd_reading, sd_crc_valid;
 static sdcard_init_step_t last_step;
-static unsigned char last_r1, last_ver;
+static unsigned char last_r1, last_ver, xfer_r1;
 
 #pragma code
 
@@ -82,14 +82,16 @@ void fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
 
   if (ready)
     {
-      usb_data_packet_t item;
+      static usb_data_packet_t item;
 
       usb_in_h[usb_in_idx] =  USBGenRead (USBGEN_EP_NUM,
                                           (unsigned char*)&usb_in[usb_in_idx],
                                           USBGEN_EP_SIZE);
       usb_in_idx ^= 1;
       item.cmd = GPS_STATE_REQ;
-      item.my_true = true;
+      item.bits.my_true = true;
+      item.bits.xfer_is_reading = sd_reading;
+      item.bits.xfer_crc_match = sd_crc_valid;
       item.current = current;
       item.next = next;
       item.requested = requested;
@@ -98,8 +100,18 @@ void fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
       item.sdcard_init = last_step;
       item.last_r1 = last_r1;
       item.sdcard_version = last_ver;
+      item.xfer_r1 = xfer_r1;
       fifo_push_usb (&item, USBGEN_EP_SIZE - sizeof (item.unused_req));
     }
+}
+
+void fifo_broadcast_xfer_usb (bool_t isReading,
+                              unsigned char r1,
+                              bool_t isValidCRC)
+{
+  sd_reading = isReading;
+  xfer_r1 = r1;
+  sd_crc_valid = isValidCRC;
 }
 
 bool_t fifo_fetch_usb (usb_data_packet_t *result, unsigned char *len)

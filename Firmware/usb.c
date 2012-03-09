@@ -60,14 +60,15 @@ void usb_initialize(void)
 
 bool_t usb_process (user_request_t *request)
 {
-  bool_t do_more = false;
-  unsigned char len;
+  static bool_t do_more;
+  static unsigned char len;
+  do_more = false;
 
   if (fifo_fetch_usb (&usb_inbound, &len))
     {
-      unsigned char buffer_cntr;
-      unsigned char num_return_bytes; // Number of bytes to return in response
-      unsigned int  lcntr;
+      static unsigned char buffer_cntr;
+      static unsigned char num_return_bytes;
+      static unsigned int  lcntr;
       
       num_return_bytes = 0;  // Initially, assume nothing needs to be returned
       switch (usb_inbound.cmd)

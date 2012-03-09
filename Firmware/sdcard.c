@@ -59,6 +59,12 @@ typedef struct
 
 typedef union
 {
+  unsigned char _byte[2];
+  unsigned int  value;
+} sd_crc16_t;
+
+typedef union
+{
   unsigned char val[5];
   struct // R1 and R1b
   {
@@ -107,7 +113,7 @@ static unsigned char csd[16];
 
 unsigned char sdcard_crc7 (unsigned char data, unsigned char prev)
 {
-  unsigned char crc, i;
+  static unsigned char crc, i;
 
   crc = prev;
   for (i = 0 ; i < 8u ; i++)
@@ -123,7 +129,7 @@ unsigned char sdcard_crc7 (unsigned char data, unsigned char prev)
 
 unsigned int sdcard_crc16 (unsigned char data, unsigned int crc) 
 { 
-  unsigned int x;
+  static unsigned int x;
 
   x = (crc >> 8) & 0x00ff;
   x = x ^ data;
@@ -133,16 +139,11 @@ unsigned int sdcard_crc16 (unsigned char data, unsigned int crc)
   return crc; 
 }
 
-// length is determined from command.
-void sdcard_block (sd_command_t c, unsigned char *block)
-{
-}
-
 void sdcard_process (sd_command_t c,
                      unsigned long int arg,
                      sd_response_name_t r)
 {
-  unsigned char crc,data,i,j,n;
+  static unsigned char crc,data,i,j,n;
 
   SD_CS = 0;
   putcSPI (c);
@@ -197,6 +198,38 @@ void sdcard_process (sd_command_t c,
   SD_CS = 1;
 }
 
+// length is determined from command.
+void sdcard_read_block (sd_command_t c, unsigned char *block)
+{
+  static sd_crc16_t crc, expected;
+  static unsigned int count, i;
+
+  switch (c)
+    {
+    case SD_SEND_CID:
+    case SD_SEND_CSD:
+      count = 16;
+      break;
+
+    default:
+      count = 512;
+      break;
+    }
+
+  sdcard_process (c, 0x00u, R1);
+  SD_CS = 1;
+  crc.value = 0;
+  for (i = 0 ; i < count && i < 512u ; i++) // maximum is always 512 bytes
+    {
+      block[i] = getcSPI();
+      crc.value = sdcard_crc16 (block[i], crc.value);
+    }
+  crc._byte[0] = getcSPI();
+  crc._byte[1] = getcSPI();
+  SD_CS = 1;
+  fifo_broadcast_xfer_usb (true, reply.val[0], crc.value == expected.value);
+}
+
 void sdcard_erase(void)
 {
 }
@@ -211,9 +244,9 @@ unsigned int sdcard_get_status(void)
 
 void sdcard_initialize(void)
 {
-  bool_t sdsc;
-  unsigned char i;
-  unsigned long int acmd41_arg;
+  static bool_t sdsc;
+  static unsigned char i;
+  static unsigned long int acmd41_arg;
 
   sdsc = true;
   acmd41_arg = 0x00u;
@@ -290,12 +323,14 @@ void sdcard_initialize(void)
       sdcard_process (SD_SET_BLOCKLEN, 0x200, R1);
       fifo_broadcast_sdcard_usb (sdsc ? SD_INIT_DONE_SDSC : SD_INIT_DONE_SDSH_X,
                                  reply.val[0], version);
+      sdcard_read_block (SD_SEND_CID, cid);
+      sdcard_read_block (SD_SEND_CSD, csd);
     }
 }
 
 unsigned char sdcard_read (unsigned char *s, unsigned char len)
 {
-  unsigned char result = 0u;
+  static unsigned char result = 0u;
   return result;
 }
 

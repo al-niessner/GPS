@@ -42,7 +42,8 @@ static usb_data_packet_t send_msg;
 
 fsm_state_t fsm_adjust (fsm_state_t desire)
 {
-  fsm_state_t next = desire;
+  static fsm_state_t next;
+  next = desire;
 
   if (required < UNDEFINED)
     {
@@ -74,10 +75,11 @@ fsm_state_t fsm_clear(void)
 
 fsm_state_t fsm_idle (bool_t full)
 {
-  bool_t two_button_action;
-  button_event_t be[2];
-  fsm_state_t next = full ? S1:S0;
+  static bool_t two_button_action;
+  static button_event_t be[2];
+  static fsm_state_t next;
 
+  next = full ? S1:S0;
   basic = !full;
   fifo_set_allow (full);
 

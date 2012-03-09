@@ -120,7 +120,13 @@ typedef union usb_data_packet
   struct // GPS_STATE_REQ
   {
     usb_cmd_t cmd;
-    unsigned char my_true;
+    struct
+    {
+      unsigned my_true         : 1;
+      unsigned xfer_is_reading : 1;
+      unsigned xfer_crc_match  : 1;
+      unsigned unused_bits     : 5;
+    } bits;
     fsm_state_t current;
     fsm_state_t next;
     fsm_state_t requested;
@@ -129,7 +135,8 @@ typedef union usb_data_packet
     sdcard_init_step_t sdcard_init;
     unsigned char last_r1;
     unsigned char sdcard_version;
-    unsigned char unused_req[USBGEN_EP_SIZE - 13];
+    unsigned char xfer_r1;
+    unsigned char unused_req[USBGEN_EP_SIZE - 14];
   };
 
   struct // GPS_SDC_STATE_REQ

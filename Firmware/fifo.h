@@ -36,6 +36,9 @@ void fifo_push_state (fsm_state_t current, fsm_state_t next,
 bool_t fifo_fetch_time_event(button_event_t *button); // array of 2
 void   fifo_push_time_event(button_event_t *button); // array of 2
 
+void   fifo_broadcast_xfer_usb (bool_t isReading,
+                                unsigned char r1,
+                                bool_t isValidCRC);
 void   fifo_broadcast_sdcard_usb (sdcard_init_step_t step,
                                   unsigned char r1,
                                   unsigned char ver);

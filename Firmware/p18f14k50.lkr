@@ -18,8 +18,6 @@ DATABANK   NAME=gpr0       START=0x60              END=0xFF
 DATABANK   NAME=gpr1       START=0x100             END=0x1FF
 DATABANK   NAME=usb2       START=0x200             END=0x2FF          PROTECTED
 
-DATABANK   NAME=gps        START=0x300             END=0xEFF
-
 DATABANK   NAME=sfr15      START=0xF40             END=0xF5F          PROTECTED
 ACCESSBANK NAME=accesssfr  START=0xF60             END=0xFFF          PROTECTED
 
