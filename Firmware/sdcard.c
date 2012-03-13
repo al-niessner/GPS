@@ -199,7 +199,7 @@ void sdcard_process (sd_command_t c,
 }
 
 // length is determined from command.
-void sdcard_read_block (sd_command_t c, unsigned char *block)
+void sdcard_proc_block (sd_command_t c, unsigned int arg, unsigned char *block)
 {
   static sd_crc16_t crc, expected;
   static unsigned int count, i;
@@ -212,7 +212,7 @@ void sdcard_read_block (sd_command_t c, unsigned char *block)
       break;
 
     default:
-      count = 512;
+      count = SD_PAGE_SIZE;
       break;
     }
 
@@ -225,7 +225,7 @@ void sdcard_read_block (sd_command_t c, unsigned char *block)
 
   if (block[0] == 0xfeu)
     {
-      for (i = 0 ; i < count && i < 512u ; i++) // maximum is always 512 bytes
+      for (i = 0 ; i < count && i < SD_PAGE_SIZE ; i++)
         {
           block[i] = getcSPI();
           crc.value = sdcard_crc16 (block[i], crc.value);
@@ -233,7 +233,7 @@ void sdcard_read_block (sd_command_t c, unsigned char *block)
       expected._byte[1] = getcSPI();
       expected._byte[0] = getcSPI();
       getcSPI(); // read the last bit that is required to be 1
-      for (i = 4 ; i ; i--) putcSPI(SD_NULL); // give the card time to finish
+      for (i = 0xffff ; i && sdcard_get_status() ; i--) putcSPI(SD_NULL);
     }
 
   fifo_broadcast_xfer_usb (true, reply.val[0], crc.value == expected.value);
@@ -330,21 +330,25 @@ void sdcard_initialize(void)
         }
 
       // make all cards compatible since SDCH/X cards are fixed at 512 anyway
-      sdcard_process (SD_SET_BLOCKLEN, 0x200, R1);
+      sdcard_process (SD_SET_BLOCKLEN, SD_PAGE_SIZE, R1);
       fifo_broadcast_sdcard_usb (sdsc ? SD_INIT_DONE_SDSC : SD_INIT_DONE_SDSH_X,
                                  reply.val[0], version);
       for (i = 0 ; i < sizeof (cid) ; i++) cid[i] = csd[i] = 0x00u;
-      sdcard_read_block (SD_SEND_CID, cid);
-      sdcard_read_block (SD_SEND_CSD, csd);
+      sdcard_proc_block (SD_SEND_CID, 0x0, cid);
+      sdcard_proc_block (SD_SEND_CSD, 0x0, csd);
     }
 }
 
-unsigned char sdcard_read (unsigned char *s, unsigned char len)
+void sdcard_read (unsigned char *pages, unsigned char page_count)
 {
-  static unsigned char result = 0u;
-  return result;
+  unsigned char i;
+
+  for (i = 0 ; i < page_count ; i++)
+    {
+      sdcard_proc_block (SD_READ_BLOCK, 0x0, &pages[i * SD_PAGE_SIZE]);
+    }
 }
 
-void sdcard_write (unsigned char *s, unsigned char len)
+void sdcard_write (unsigned char *pages, unsigned char page_count)
 {
 }

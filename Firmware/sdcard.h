@@ -29,11 +29,13 @@
 
 #include "memory.h"
 
+#define SD_PAGE_SIZE (0x200u)
+
 void          sdcard_erase(void);
 unsigned char *sdcard_get_CID(void);
 unsigned char *sdcard_get_CSD(void);
 unsigned int  sdcard_get_status(void);
 void          sdcard_initialize(void);
-unsigned char sdcard_read (unsigned char *s, unsigned char len);
-void          sdcard_write (unsigned char *s, unsigned char len);
+void          sdcard_read (unsigned char *pages, unsigned char page_count);
+void          sdcard_write (unsigned char *pages, unsigned char page_count);
 #endif
