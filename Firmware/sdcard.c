@@ -208,7 +208,7 @@ void sdcard_read_block (sd_command_t c, unsigned char *block)
     {
     case SD_SEND_CID:
     case SD_SEND_CSD:
-      count = 16;
+      count = sizeof (csd);
       break;
 
     default:
@@ -217,17 +217,27 @@ void sdcard_read_block (sd_command_t c, unsigned char *block)
     }
 
   sdcard_process (c, 0x00u, R1);
-  SD_CS = 1;
+  SD_CS = 0;
   crc.value = 0;
-  for (i = 0 ; i < count && i < 512u ; i++) // maximum is always 512 bytes
+  block[0] = 0;
+  for (i = 0xff ; i &&  (reply.val[0] == 0x00u && block[0] != 0xfe) ; i--)
+    block[0] = getcSPI(); // wait for start bit
+
+  if (block[0] == 0xfeu)
     {
-      block[i] = getcSPI();
-      crc.value = sdcard_crc16 (block[i], crc.value);
+      for (i = 0 ; i < count && i < 512u ; i++) // maximum is always 512 bytes
+        {
+          block[i] = getcSPI();
+          crc.value = sdcard_crc16 (block[i], crc.value);
+        }
+      expected._byte[1] = getcSPI();
+      expected._byte[0] = getcSPI();
+      getcSPI(); // read the last bit that is required to be 1
+      for (i = 4 ; i ; i--) putcSPI(SD_NULL); // give the card time to finish
     }
-  crc._byte[0] = getcSPI();
-  crc._byte[1] = getcSPI();
-  SD_CS = 1;
+
   fifo_broadcast_xfer_usb (true, reply.val[0], crc.value == expected.value);
+  SD_CS = 1;
 }
 
 void sdcard_erase(void)
@@ -323,6 +333,7 @@ void sdcard_initialize(void)
       sdcard_process (SD_SET_BLOCKLEN, 0x200, R1);
       fifo_broadcast_sdcard_usb (sdsc ? SD_INIT_DONE_SDSC : SD_INIT_DONE_SDSH_X,
                                  reply.val[0], version);
+      for (i = 0 ; i < sizeof (cid) ; i++) cid[i] = csd[i] = 0x00u;
       sdcard_read_block (SD_SEND_CID, cid);
       sdcard_read_block (SD_SEND_CSD, csd);
     }
