@@ -24,9 +24,9 @@
 #include <USB/usb_function_generic.h>
 
 #include "fifo.h"
+#include "memory_eeprom.h"
 #include "memory_version.h"
 #include "usb.h"
-#include "usb_eeprom.h"
 
 #define GPS_PRODUCT_ID 0x00,0x03
 

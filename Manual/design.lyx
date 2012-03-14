@@ -2080,7 +2080,7 @@ main main.c, main_config.c
 \end_layout
 
 \begin_layout Description
-memory memory.h, memory_version.h, HardwareProfile.h
+memory memory.h, memory_eeprom.{h,c}, memory_version.h, HardwareProfile.h
 \end_layout
 
 \begin_layout Description
@@ -2092,7 +2092,7 @@ serial serial.{h,c}
 \end_layout
 
 \begin_layout Description
-usb usb.{h,c}, usb_cb.c, usb_config.h, usb_desc.c, usb_eeprom.{h,c}
+usb usb.{h,c}, usb_cb.c, usb_config.h, usb_desc.c
 \end_layout
 
 \begin_layout Standard
@@ -2676,6 +2676,60 @@ On transitions, the event is always listed.
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+SD Card File System
+\end_layout
+
+\begin_layout Standard
+There is no file system for the SD Card.
+ To increase the SD Card's life span, it is treated as a very large circular
+ buffer.
+ The pointers for the beginning and end of the circular buffer are kept
+ in the PIC's EEPROM.
+ If the SD Card is replaced with a new one, the counters will start at the
+ beginning of the SD Card.
+ The history of SD Cards used in this application is exactly the previous
+ one at power up and the current one at power down.
+\end_layout
+
+\begin_layout Standard
+MID
+\end_layout
+
+\begin_layout Standard
+SSN
+\end_layout
+
+\begin_layout Standard
+read addr : read crc (2x)
+\end_layout
+
+\begin_layout Standard
+write addr : write crc (2x)
+\end_layout
+
+\begin_layout Standard
+The read and write addresses are combined with the SD crc7 value to ensure
+ that the starting and ending points are not lost.
+ The idea is that the crc is written first followed by the address.
+ It is then repeated at a different memory location guarenteeing one of
+ the address-crc pair to be valid.
+ On power up, ff MID and SSN in the eeprom do not match the ones retreived
+ from the SD Card, then read and write are set to 0.
+ Otherwise, the largest for write and smallest for read (ignoring wrap around)
+ of valid address-crc pairs are chosen as the starting points.
+\end_layout
+
+\begin_layout Standard
+The read address points at the next block to be read.
+ The write address points at the next block to written.
+ When they are pointing at the same place, the card is empty.
+ When the card is asked to clear, the read address is advanced to the write
+ address.
+ These behaviors allow all of the card to be exercised to reduce wear out
+ from excessive writes to a single block.
 \end_layout
 
 \begin_layout Section
