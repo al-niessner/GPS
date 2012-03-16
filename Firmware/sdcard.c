@@ -360,6 +360,9 @@ void sdcard_update_mbr(void)
 {
   static unsigned char idx, read_crc, write_crc;
 
+  if (total_pages <= read_page)  read_page = 0;
+  if (total_pages <= write_page) write_page = 0;
+
   mbr.read_page_1  = mbr.read_page_2  = read_page;
   mbr.write_page_1 = mbr.write_page_2 = write_page;
   read_crc = write_crc = 0;
