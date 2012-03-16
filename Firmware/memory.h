@@ -53,16 +53,12 @@ typedef enum { SD_POWER_UP=0x00, // device is turned on
                SD_INIT_SCD=0x07, // sent APP_SEND_OP_COND to init HW
                SD_WAIT_SCD=0x09, // waited for the card to finish
                SD_OCR_READ=0x08, // read the OCR
+               SD_CID_READ=0x0a, // read the CID
+               SD_CSD_READ=0x0b, // read the CSD
                SD_INIT_DONE_SDSC=0x80,
                SD_INIT_DONE_SDSH_X=0xc0
 } sdcard_init_step_t;
 
-typedef struct sd_mbr
-{
-  unsigned long int  last_read;
-  unsigned long int  last_write;
-  unsigned short int crc16;
-} sd_mbr_t;
 
 /**
   * Time Event
@@ -78,15 +74,16 @@ typedef enum { FALLING_EDGE, RISING_EDGE, SS_HIGH, SS_LOW } button_event_t;
 
 typedef enum
 {
-  READ_EEDATA_CMD   = 0x04,  // Read from the device EEPROM.
-  WRITE_EEDATA_CMD  = 0x05,  // Write to the device EEPROM.
+  READ_EEDATA_CMD    = 0x04,  // Read from the device EEPROM.
+  WRITE_EEDATA_CMD   = 0x05,  // Write to the device EEPROM.
 
-  GPS_VER_CMD       = 0x80,  // Get the version of the GPS firmware
-  GPS_REQUEST_CMD   = 0x81,  // Set the state
-  GPS_STATE_REQ     = 0x82,  // Get the current and next state and timing
-  GPS_SDC_STATE_REQ = 0x83,  // Get the status, CDS, and CIS from the SD Card
+  GPS_VER_CMD        = 0x80,  // Get the version of the GPS firmware
+  GPS_REQUEST_CMD    = 0x81,  // Set the state
+  GPS_STATE_REQ      = 0x82,  // Get the current and next state and timing
+  GPS_SDC_CONFIG_REQ = 0x83,  // Get the CDS and CIS from the SD Card
+  GPS_SDC_STATE_REQ = 0x84,  // Get the status, last read, and last written
 
-  RESET_CMD         = 0xff   // Cause a power-on reset.
+  RESET_CMD          = 0xff   // Cause a power-on reset.
 } usb_cmd_t;
 
 typedef struct usb_device_info
@@ -139,11 +136,22 @@ typedef union usb_data_packet
     unsigned char unused_req[USBGEN_EP_SIZE - 14];
   };
 
-  struct // GPS_SDC_STATE_REQ
+  struct // GPS_SDC_CONFIG_REQ
   {
-    unsigned int status;
+    usb_cmd_t cmd;
+    unsigned char fill;
     unsigned char cid[15];
     unsigned char csd[15];
+  };
+
+  struct // GPS_SDC_STATE_REQ
+  {
+    usb_cmd_t cmd;
+    unsigned int sdc_status;
+    unsigned long int next_page_to_read;
+    unsigned long int next_page_to_write;
+    unsigned long int total_pages;
+    unsigned char unused[USBGEN_EP_SIZE - 15];
   };
 
   struct // EEPROM read/write structure

@@ -38,8 +38,10 @@ void main_hpi(void);
 void main_initialize(void);
 void main_lpi(void);
 
+#pragma udata access fast_access
+static near unsigned int timer_counter;
+
 #pragma udata
-static unsigned int timer_counter;
 
 #pragma code REMAPPED_RESET_VECTOR = REMAPPED_RESET_VECTOR_ADDRESS
 extern void _startup( void );        // See c018i.c in your C18 compiler dir

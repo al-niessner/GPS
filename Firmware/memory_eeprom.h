@@ -23,6 +23,26 @@
 #ifndef GPS_EEPROM_H
 #define GPS_EEPROM_H
 
+/**
+  * Definitions of flags stored in EEPROM of the uC.
+ **/
+
+// a 25 byte buffer from 0xe0 to 0xf8 inclusive
+#define SD_CIRC_BUFF_INDICES_ADDR 0xe0 
+
+#define JTAG_DISABLE_FLAG_ADDR 0xfd
+#define DISABLE_JTAG 0x69
+
+#define FLASH_ENABLE_FLAG_ADDR 0xfe
+#define ENABLE_FLASH 0xac
+
+#define BOOT_SELECT_FLAG_ADDR 0xff
+#define BOOT_INTO_USER_MODE 0xc5
+#define BOOT_INTO_REFLASH_MODE 0x3a
+
+/**
+  * Access methods
+ **/
 unsigned char eeprom_read  (unsigned char address);
 void          eeprom_write (unsigned char address, unsigned char data);
 

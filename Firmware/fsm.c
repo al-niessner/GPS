@@ -166,10 +166,20 @@ fsm_state_t fsm_usb(void)
             }
           break;
 
-        case GPS_SDC_STATE_REQ:
-          send_msg.status = sdcard_get_status();
+        case GPS_SDC_CONFIG_REQ:
+          send_msg.cmd = GPS_SDC_CONFIG_REQ;
+          send_msg.fill = 0;
           memcpy (send_msg.cid, (const void*)sdcard_get_CID(), 15);
           memcpy (send_msg.csd, (const void*)sdcard_get_CSD(), 15);
+          fifo_push_usb (&send_msg, USBGEN_EP_SIZE);
+          break;
+
+        case GPS_SDC_STATE_REQ:
+          send_msg.cmd = GPS_SDC_STATE_REQ;
+          send_msg.sdc_status = sdcard_get_status();
+          send_msg.next_page_to_read = sdcard_get_read_page();
+          send_msg.next_page_to_write = sdcard_get_write_page();
+          send_msg.total_pages = sdcard_get_total_pages();
           fifo_push_usb (&send_msg, USBGEN_EP_SIZE);
           break;
 

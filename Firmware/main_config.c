@@ -34,7 +34,7 @@
 #pragma config  WDTPS   = 32768 // Watch-dog timer postscaler.
 #pragma config  MCLRE   = ON // Enable MCLR pin.
 #pragma config  HFOFST  = OFF // HFINTOSC is not used, so who cares about fast start-up.
-#pragma config  STVREN  = ON // Stack overflow causes a reset.
+#pragma config  STVREN  = ON  // Stack overflow causes a reset.
 #pragma config  LVP     = OFF // No low-voltage programming.
 #pragma config  BBSIZ   = OFF // Set boot block size to 2 KB (1 KW).
 #pragma config  XINST   = OFF // Disable extended instructions.

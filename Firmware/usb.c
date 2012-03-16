@@ -81,6 +81,11 @@ bool_t usb_process (user_request_t *request)
           request->details.state    = usb_inbound.new_state;
           break;
 
+        case GPS_SDC_CONFIG_REQ:
+          do_more = true;
+          request->command          = usb_inbound.cmd;
+          break;
+
         case GPS_SDC_STATE_REQ:
           do_more = true;
           request->command          = usb_inbound.cmd;
