@@ -25,6 +25,11 @@
 
 #include "fifo.h"
 
+#pragma udata circ_buf
+
+static unsigned char read_buffer[512];
+static unsigned char write_buffer[1024];
+
 #pragma udata
 
 static fsm_state_t state_c, state_n, state_request, state_require;

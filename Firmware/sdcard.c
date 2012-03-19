@@ -397,7 +397,7 @@ unsigned int sdcard_get_status(void)
 void sdcard_initialize(void)
 {
   static bool_t sdsc;
-  static unsigned char i;
+  unsigned char i;
   static unsigned long int acmd41_arg;
 
   sdsc = true;

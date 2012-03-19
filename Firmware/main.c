@@ -75,6 +75,7 @@ void main(void)
   last = 0u;
   ltc = 0u;
   main_initialize();
+  LED_OFF();
   while (true)
     {
       tc = timer_counter;
@@ -89,8 +90,14 @@ void main(void)
         }
       else cost = now - last;
 
+      if ((tc & 0x40) == 0x0u) LED_OFF();
+      else LED_ON();
+
       last = now;
       ltc = tc;
+#if defined (USB_POLLING)
+      usb_handle();
+#endif
       fifo_pop_state (&c, &n, &m, &r);
       fifo_broadcast_state_usb (c, n, m, r, cost);
       fsm_process();
@@ -119,7 +126,7 @@ void main_initialize(void)
 
   // Initialize the timer
   T3CON            = 0b00000000;  // 12 MHz clock input to TIMER3 and disabled.
-  IPR2bits.TMR3IP  = 0;   // Make TIMER3 overflow a low-priority interrupt.
+  IPR2bits.TMR3IP  = 1;   // Make TIMER3 overflow a high-priority interrupt.
   PIR2bits.TMR3IF  = 0;   // Clear TIMER3 interrupt flag.
   PIE2bits.TMR3IE  = 1;   // Enable TIMER3 interrupt.
   T3CONbits.TMR3ON = 1;   // Enable TIMER3.
@@ -128,6 +135,7 @@ void main_initialize(void)
   tris_usb_bus_sense = INPUT_PIN;
   #endif
 
+  LED_ON();
   fsm_initialize();
   sdcard_initialize();
   usb_initialize();
@@ -142,12 +150,6 @@ void main_initialize(void)
 #pragma interrupt main_hpi
 void main_hpi(void)
 {
-  usb_handle();
-}
-
-#pragma interruptlow main_lpi
-void main_lpi(void)
-{
   if (PIR2bits.TMR3IF) // interrupt is from the timer to generate time events
     {
       // preload the counter for a 64 Hz rate. 45 Hz is the slowest.
@@ -156,5 +158,14 @@ void main_lpi(void)
       PIR2bits.TMR3IF = 0;
       timer_counter++;
     }
+#if defined (USB_INTERRUPT)
+  else usb_handle();
+#endif
 }
 
+#pragma interruptlow main_lpi
+void main_lpi(void)
+{
+}
+
+#pragma code

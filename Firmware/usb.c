@@ -55,7 +55,10 @@ void usb_handle(void)
 void usb_initialize(void)
 {
   USBDeviceInit();
+
+#if defined (USB_INTERRUPT)
   USBDeviceAttach();
+#endif
 }
 
 bool_t usb_process (user_request_t *request)
