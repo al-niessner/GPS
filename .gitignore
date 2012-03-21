@@ -3,14 +3,9 @@
 #*
 *.pyc
 *.dia
+xsusbprg.log
 design.pdf
 notes.txt
 Data
-Firmware/gps.hex
 Firmware/.X
-Firmware/Boot/.immediate
-Firmware/Boot/.output
-Firmware/Boot/gpsboot.mcs
-Firmware/Boot/gpsboot.mcw
-Firmware/Boot/gpsboot.mptags
-Firmware/Boot/gpsboot.tagsrc
+
