@@ -29,6 +29,10 @@
 #include "usb.h"
 
 
+#pragma romdata
+static const rom char new_track[]    = "\r\n$PDIYNT,*1E\r\n";
+static const rom char new_waypoint[] = "\r\n$PDIYWP,*2F\r\n";
+
 #pragma udata overlay gps_fsm
 static fsm_shared_block_t fsm;
 
@@ -42,6 +46,7 @@ static usb_shared_block_t usb;
 #pragma udata
 static bool_t basic;
 static unsigned char duration[2] = {0, 0};
+static unsigned char idx;
 
 
 #pragma code
@@ -129,7 +134,7 @@ void fsm_track(void)
   if (duration[0] == 2u)
     {
       LED_ON();
-      // TODO: send $PDIYNT„*1E<CR><LF>
+      for (idx = 0 ; idx < 0xfu ; idx++) sdcard_write (new_track[idx]);
     }
 
   fsm.next = S1;
@@ -196,7 +201,7 @@ void fsm_waypt(void)
   if (duration[1] == 2u)
     {
       LED_ON();
-      // TODO: send $PDIYWP,*2F<CR><LF>
+      for (idx = 0 ; idx < 0xfu ; idx++) sdcard_write (new_waypoint[idx]);
     }
 
   fsm.next = S1;

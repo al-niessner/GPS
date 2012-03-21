@@ -134,10 +134,11 @@ static sdcard_shared_block_t sdcard;
 
 #pragma udata
 
+static sd_crc16_t    crc, expected;
 static sd_mbr_t      mbr;
 static sd_response_t reply;
 static unsigned char version;
-static unsigned int  offset;
+static unsigned int  bidx, offset;
 
 
 #pragma code
@@ -305,42 +306,25 @@ void sdcard_process (sd_command_t c,
 // length is determined from command.
 void sdcard_proc_block (sd_command_t c, unsigned char *block)
 {
-  static sd_crc16_t crc, expected;
-  static unsigned int i;
-
   sdcard_process (c, 0x0, R1);
   SD_CS = 0;
   crc.value = 0;
   block[0] = 0;
-  for (i = 0xff ; i &&  (reply.val[0] == 0x00u && block[0] != 0xfe) ; i--)
+  for (bidx = 0xff ; bidx && (reply.val[0] == 0u && block[0] != 0xfe) ; bidx--)
     block[0] = getcSPI(); // wait for start bit
 
   if (block[0] == 0xfeu)
     {
-      if (c == SD_WRITE_BLOCK)
+      for (bidx = 0 ; bidx < 0x10u ; bidx++)
         {
-          for (i = 0 ; i < 0x10u ; i++)
-            {
-              putcSPI (block[i]);
-              crc.value = sdcard_crc16 (block[i], crc.value);
-            }
-          putcSPI (crc._byte[1]);
-          putcSPI (crc._byte[0]);
-          putcSPI (0xff); // last bit must be high
+          block[bidx] = getcSPI();
+          crc.value = sdcard_crc16 (block[bidx], crc.value);
         }
-      else // read data block from SD Card
-      {
-          for (i = 0 ; i < 0x10u ; i++)
-            {
-              block[i] = getcSPI();
-              crc.value = sdcard_crc16 (block[i], crc.value);
-            }
-          expected._byte[1] = getcSPI();
-          expected._byte[0] = getcSPI();
-          getcSPI(); // read the last bit that is required to be 1
-      }
-
-      for (i = 0xffff ; i && sdcard_get_status() ; i--) putcSPI(SD_NULL);
+      expected._byte[1] = getcSPI();
+      expected._byte[0] = getcSPI();
+      getcSPI(); // read the last bit that is required to be 1
+      for (bidx = 0xffff ; bidx && sdcard_get_status() ; bidx--)
+        putcSPI(SD_NULL);
     }
 
   fifo_broadcast_xfer_usb (true, reply.val[0], crc.value == expected.value);
@@ -506,25 +490,86 @@ unsigned char sdcard_read (void)
   unsigned char result;
 
   if (offset & 0x8000) sdcard_complete_block();
+  else offset &= 0x1ff;
 
-  offset &= 0x1ff;
+  if (offset == 0u)
+    { // new block
+      sdcard_process (SD_READ_BLOCK, sdcard.read_page, R1);
+      SD_CS = 0;
+      crc.value = 0;
+      result = 0;
+      for (bidx = 0xff ; bidx &&(reply.val[0] == 0u && result != 0xfe) ; bidx--)
+        result = getcSPI(); // wait for start bit
+
+      if (result == 0xfeu) offset = SD_PAGE_SIZE;
+      else offset = 0;
+    }
+  else result = 0xfeu;
+
+  if (result == 0xfeu)
+    {
+      SD_CS = 0;
+      result = getcSPI();
+      crc.value = sdcard_crc16 (result, crc.value);
+      offset--;
+    }
+
   if (0u < offset) offset |= 0x4000;
+  else
+    { // close the block
+      expected._byte[1] = getcSPI();
+      expected._byte[0] = getcSPI();
+      getcSPI(); // read the last bit that is required to be 1
+      for (bidx = 0xffff ; bidx && sdcard_get_status() ; bidx--)
+        putcSPI(SD_NULL);
+      fifo_broadcast_xfer_usb (true, reply.val[0], crc.value == expected.value);
+    }
 
+  SD_CS = 1;
   return result;
 }
 
 void sdcard_write (unsigned char c)
 {
+  unsigned char result;
+
   if (offset & 0x4000) sdcard_complete_block();
   else offset &= 0x1ff;
 
   if (offset == 0u)
     { // new block
-      offset = SD_PAGE_SIZE;
+      sdcard_process (SD_WRITE_BLOCK, sdcard.write_page, R1);
+      SD_CS = 0;
+      crc.value = 0;
+      result = 0;
+      for (bidx = 0xff ; bidx &&(reply.val[0] == 0u && result != 0xfe) ; bidx--)
+        result = getcSPI(); // wait for start bit
+      
+      if (result == 0xfeu) offset = SD_PAGE_SIZE;
+      else offset = 0;
+    }
+  else result = 0xfeu;
+
+  if (result == 0xfeu)
+    {
+      SD_CS = 0;
+      putcSPI (c);
+      crc.value = sdcard_crc16 (c, crc.value);
+      offset--;
     }
 
   if (0u < offset) offset |= 0x8000;
   else
     { // close the block
+      putcSPI (crc._byte[1]);
+      putcSPI (crc._byte[0]);
+      putcSPI (0xff); // last bit must be high
+      for (bidx = 0xffff ; bidx && sdcard_get_status() ; bidx--)
+        putcSPI(SD_NULL);
+      fifo_broadcast_xfer_usb (false, reply.val[0], true);
+      sdcard.write_page++;
+      sdcard_update_mbr();
     }
+
+  SD_CS = 1;
 }
