@@ -27,6 +27,6 @@
 
 void   usb_handle(void);
 void   usb_initialize(void);
-bool_t usb_process (user_request_t *request);
+bool_t usb_process(void);
 
 #endif

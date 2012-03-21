@@ -27,7 +27,5 @@
 
 void fsm_initialize(void);
 void fsm_process (void);
-void fsm_request_state (fsm_state_t state);
-void fsm_set_state (fsm_state_t state);
 
 #endif

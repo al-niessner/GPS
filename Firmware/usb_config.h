@@ -79,8 +79,8 @@
 //#define USB_PING_PONG_MODE USB_PING_PONG__ALL_BUT_EP0		//NOTE: This mode is not supported in PIC18F4550 family rev A3 devices
 
 
-#define USB_POLLING
-//#define USB_INTERRUPT
+//#define USB_POLLING
+#define USB_INTERRUPT
 
 /* Parameter definitions are defined in usb_device.h */
 #define USB_PULLUP_OPTION USB_PULLUP_ENABLE
@@ -124,5 +124,11 @@
 #define USBGEN_EP_NUM 1u
 
 /** DEFINITIONS ****************************************************/
+
+#if defined(USB_INTERRUPT) 
+    #define USBEnableInterrupts() {IPR2bits.USBIP = 0;PIE2bits.USBIE = 1;} 
+#else 
+    #define USBEnableInterrupts() 
+#endif 
 
 #endif //USBCFG_H

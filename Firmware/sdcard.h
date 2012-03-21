@@ -32,12 +32,7 @@
 #define SD_PAGE_SIZE (0x200u)
 
 void              sdcard_erase(void);
-unsigned char*    sdcard_get_CID(void);
-unsigned char*    sdcard_get_CSD(void);
 unsigned int      sdcard_get_status(void);
-unsigned long int sdcard_get_read_page(void);
-unsigned long int sdcard_get_write_page(void);
-unsigned long int sdcard_get_total_pages(void);
 void              sdcard_initialize(void);
 void              sdcard_read (unsigned char *pages, unsigned char page_count);
 void              sdcard_write (unsigned char *pages, unsigned char page_count);

@@ -28,11 +28,6 @@
 void   fifo_initialize(void);
 void   fifo_initialize_usb(void);
 
-void fifo_pop_state  (fsm_state_t *current, fsm_state_t *next,
-                      fsm_state_t *requested, fsm_state_t *required);
-void fifo_push_state (fsm_state_t current, fsm_state_t next,
-                      fsm_state_t requested, fsm_state_t required);
-
 bool_t fifo_fetch_time_event(button_event_t *button); // array of 2
 void   fifo_push_time_event(button_event_t *button); // array of 2
 
@@ -42,13 +37,11 @@ void   fifo_broadcast_xfer_usb (bool_t isReading,
 void   fifo_broadcast_sdcard_usb (sdcard_init_step_t step,
                                   unsigned char r1,
                                   unsigned char ver);
-void   fifo_broadcast_state_usb (fsm_state_t current, fsm_state_t next,
-                                 fsm_state_t requested, fsm_state_t required,
-                                 unsigned long int timing);
+void   fifo_broadcast_state_usb (unsigned long int timing);
 
-bool_t fifo_fetch_usb (usb_data_packet_t *to_be_filled, unsigned char *len);
-void   fifo_push_usb (usb_data_packet_t *to_be_emptied, unsigned char len);
-bool_t fifo_waiting_usb(void); // returns true if there is a message waiting to be processed
+unsigned char fifo_fetch_usb(void);
+void          fifo_push_usb (unsigned char len);
+bool_t        fifo_waiting_usb(void); // returns true if there is a message waiting to be processed
 
 char   fifo_fetch_next(void);
 bool_t fifo_is_receiving(void);

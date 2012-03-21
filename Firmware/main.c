@@ -37,9 +37,11 @@
 void main_hpi(void);
 void main_initialize(void);
 void main_lpi(void);
+void flash (void);
 
 #pragma udata access fast_access
 static near unsigned int timer_counter;
+static near unsigned int flash_counter;
 
 #pragma udata
 
@@ -65,11 +67,23 @@ void Remapped_Low_ISR( void )
 
 
 #pragma code
+/*
+void flash (void)
+{
+  INIT_LED();
+  for (flash_counter = 0x100 ; flash_counter ; flash_counter--)
+    {
+      for (timer_counter = 0xffff ; timer_counter ; timer_counter--) ;
+      
+      if ((flash_counter & 0x010) == 0x0u) LED_TOGGLE();
+    }
+   _asm goto _startup _endasm
+}
+*/
 
 void main(void)
 {
-  static fsm_state_t c, n, m, r;
-  static unsigned int ltc, mid, tc;
+  static unsigned int ltc, tc;
   static unsigned long int cost, last, now;
 
   last = 0u;
@@ -80,8 +94,9 @@ void main(void)
     {
       tc = timer_counter;
       now = tc;
-      mid = TMR3H;
-      now = (now << 16) | (mid << 8) | TMR3L; // shifts are in place
+      now = now << 16;
+      now |= TMR3H;
+      now = (now << 8) | TMR3L; // shifts are in place
 
       if (now < last) 
         {
@@ -98,8 +113,7 @@ void main(void)
 #if defined (USB_POLLING)
       usb_handle();
 #endif
-      fifo_pop_state (&c, &n, &m, &r);
-      fifo_broadcast_state_usb (c, n, m, r, cost);
+      fifo_broadcast_state_usb (cost);
       fsm_process();
     }
 }
@@ -131,7 +145,7 @@ void main_initialize(void)
   PIE2bits.TMR3IE  = 1;   // Enable TIMER3 interrupt.
   T3CONbits.TMR3ON = 1;   // Enable TIMER3.
   
-  #if defined( USE_USB_BUS_SENSE_IO )
+  #if defined (USE_USB_BUS_SENSE_IO)
   tris_usb_bus_sense = INPUT_PIN;
   #endif
 
@@ -153,19 +167,19 @@ void main_hpi(void)
   if (PIR2bits.TMR3IF) // interrupt is from the timer to generate time events
     {
       // preload the counter for a 64 Hz rate. 45 Hz is the slowest.
-      TMR3H = 0x49;
       TMR3L = 0x62;
+      TMR3H = 0x49;
       PIR2bits.TMR3IF = 0;
       timer_counter++;
     }
-#if defined (USB_INTERRUPT)
-  else usb_handle();
-#endif
 }
 
 #pragma interruptlow main_lpi
 void main_lpi(void)
 {
+#if defined (USB_INTERRUPT)
+  usb_handle();
+#endif
 }
 
 #pragma code

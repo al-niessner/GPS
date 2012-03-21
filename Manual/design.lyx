@@ -1974,20 +1974,32 @@ reference "fig:Firmware-Use-Case"
 \end_inset
 
 .
- The LPI is periodic and is responsible for time events as well as monitoring
- the buttons.
- The LPI must be implemented to use the least number of cycles since it
- is periodic.
- The HPI is quasi-periodic and is responsible for shuffling data from the
- input interfaces to the nominal context.
- The USB interface should be aperiodic while the serial is periodic both
- on long and short time scales.
- While the USB demands are aperiodic any single command requires a lot of
- processing power.
- It will be easy for the user to swamp the capabilities of the micro-controller
- by abusing the USB interface.
- The serial interface, on the other hand, is much more predictable and should
- require very few CPU cycles to complete its task.
+ The LPI is aperiodic and is responsible for the USB interface with switch
+ to change the USB to polling instead of interupt driven.
+ While the USB demands are aperiodic, any single USB command requires a
+ lot of processing power.
+ Hence, it will be easy for the user to swamp the capabilities of the micro-cont
+roller by abusing the USB interface and the reason to be able to switch
+ between interrupt and polling
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The switch is a compile time switch and the microchip will have to be reloaded
+ with different image.
+\end_layout
+
+\end_inset
+
+.
+ The HPI is the periodic and must be very short and conform to all ISR optimazat
+ions.
+ The timer expiration is the most periodic on all scales of the interrupts
+ being generated.
+ It takes very few instructions to process the interrupt because it moves
+ the least amount of data.
+ The serial interface, on the other hand, is less predictable and also requires
+ very few CPU cycles to complete its task.
  The nominal task does all of the other work and is separate from the LPI
  and HPI via a FIFO.
 \end_layout

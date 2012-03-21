@@ -39,6 +39,15 @@ typedef enum { false=0==1, true=0==0 } bool_t;
 typedef enum { S0=0, S1, S2, S3, S4, S5, S6, S7, S8, S9,
                UNDEFINED=0xfe, INDETERMINATE=0xff } fsm_state_t;
 
+typedef struct fsm_shared_block
+{
+  fsm_state_t current;
+  fsm_state_t next;
+  fsm_state_t requested;
+  fsm_state_t required;
+} fsm_shared_block_t;
+
+
 /**
   * SD Card interface
  **/
@@ -59,6 +68,14 @@ typedef enum { SD_POWER_UP=0x00, // device is turned on
                SD_INIT_DONE_SDSH_X=0xc0
 } sdcard_init_step_t;
 
+typedef struct sdcard_shared_block
+{
+  unsigned char cid[16];
+  unsigned char csd[16];
+  unsigned long int read_page;
+  unsigned long int total_pages;
+  unsigned long int write_page;
+} sdcard_shared_block_t;
 
 /**
   * Time Event
@@ -172,18 +189,10 @@ typedef union usb_data_packet
   };
 } usb_data_packet_t;
 
-typedef struct user_request
+typedef struct usb_shared_block
 {
-  usb_cmd_t command;
-  union
-  {
-    struct
-    {
-      bool_t force;
-      fsm_state_t state;
-      unsigned int duration;
-    };
-  } details;
-} user_request_t;
+  usb_data_packet_t inbound;
+  usb_data_packet_t outbound;
+} usb_shared_block_t;
 
 #endif

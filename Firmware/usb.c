@@ -39,11 +39,10 @@ static const rom usb_device_info_t usb_dev_info =
     0x00               // Checksum (filled in later).
   };
 
-#pragma udata
+#pragma udata overlay gps_usb
+static usb_shared_block_t usb;
 
-static usb_data_packet_t usb_inbound;
-static usb_data_packet_t usb_outbound;
-volatile  unsigned long int delay;
+#pragma udata
 
 #pragma code
 
@@ -61,64 +60,58 @@ void usb_initialize(void)
 #endif
 }
 
-bool_t usb_process (user_request_t *request)
+bool_t usb_process (void)
 {
   static bool_t do_more;
   static unsigned char len;
   do_more = false;
 
-  if (fifo_fetch_usb (&usb_inbound, &len))
+  if (0u < fifo_fetch_usb())
     {
       static unsigned char buffer_cntr;
       static unsigned char num_return_bytes;
       static unsigned int  lcntr;
       
       num_return_bytes = 0;  // Initially, assume nothing needs to be returned
-      switch (usb_inbound.cmd)
+      switch (usb.inbound.cmd)
         {
         case GPS_REQUEST_CMD:
           do_more = true;
-          request->command          = usb_inbound.cmd;
-          request->details.duration = usb_inbound.duration;
-          request->details.force    = usb_inbound.force;
-          request->details.state    = usb_inbound.new_state;
           break;
 
         case GPS_SDC_CONFIG_REQ:
           do_more = true;
-          request->command          = usb_inbound.cmd;
           break;
 
         case GPS_SDC_STATE_REQ:
           do_more = true;
-          request->command          = usb_inbound.cmd;
           break;
 
         case GPS_VER_CMD:
           // Return a packet with information about this USB interface device.
-          usb_outbound.cmd = usb_inbound.cmd;
-          memcpypgm2ram ((void*)&usb_outbound.info,
+          usb.outbound.cmd = usb.inbound.cmd;
+          memcpypgm2ram ((void*)&usb.outbound.info,
                          (const rom void*)&usb_dev_info,
                          sizeof (usb_device_info_t));
           num_return_bytes  = sizeof (usb_device_info_t) + 1;
           break;
               
         case READ_EEDATA_CMD:
-          usb_outbound.cmd = usb_inbound.cmd;
-          for (buffer_cntr=0; buffer_cntr < usb_inbound.len; buffer_cntr++)
+          usb.outbound.cmd = usb.inbound.cmd;
+          for (buffer_cntr=0; buffer_cntr < usb.inbound.len; buffer_cntr++)
             {
-              usb_inbound.data[buffer_cntr] = 
-                eeprom_read ((unsigned char)usb_inbound.ADR.pAdr + buffer_cntr);
+              usb.inbound.data[buffer_cntr] = 
+                eeprom_read ((unsigned char)usb.inbound.ADR.pAdr + buffer_cntr);
             }
           num_return_bytes = buffer_cntr + 5;
           break;
               
         case WRITE_EEDATA_CMD:
-          usb_outbound.cmd = usb_inbound.cmd;
-          for(buffer_cntr=0; buffer_cntr < usb_inbound.len; buffer_cntr++)
+          usb.outbound.cmd = usb.inbound.cmd;
+          for(buffer_cntr=0; buffer_cntr < usb.inbound.len; buffer_cntr++)
             {
-              eeprom_write ((BYTE)usb_inbound.ADR.pAdr + buffer_cntr,
-                            usb_inbound.data[buffer_cntr]);
+              eeprom_write ((BYTE)usb.inbound.ADR.pAdr + buffer_cntr,
+                            usb.inbound.data[buffer_cntr]);
             }
           num_return_bytes = 1;
           break;
@@ -137,7 +130,7 @@ bool_t usb_process (user_request_t *request)
           break;
         } /* switch */
 
-      fifo_push_usb (&usb_outbound, num_return_bytes);
+      fifo_push_usb (num_return_bytes);
     }
 
   return do_more;

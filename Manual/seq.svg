@@ -253,13 +253,13 @@
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        x="130"
-       y="168.36218"
+       y="308.36218"
        id="text3974"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3976"
          x="130"
-         y="168.36218">Time Event</tspan></text>
+         y="308.36218">Time Event</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m 240,192.36218 40,0 0,40 -40,0"
@@ -268,29 +268,29 @@
     <text
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="320"
-       y="192.36218"
+       x="460"
+       y="330.36218"
        id="text4350"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4352"
-         x="320"
-         y="192.36218">Poll</tspan><tspan
+         x="460"
+         y="330.36218">Poll</tspan><tspan
          sodipodi:role="line"
-         x="320"
-         y="217.36218"
+         x="460"
+         y="355.36218"
          id="tspan4354">Buttons</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="300"
-       y="268.36218"
+       x="442"
+       y="408.36218"
        id="text4356"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4358"
-         x="300"
-         y="268.36218">Save Event</tspan></text>
+         x="442"
+         y="408.36218">Save Event</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
@@ -331,13 +331,13 @@
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        x="126"
-       y="308.36218"
+       y="168.36218"
        id="text5742"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5744"
          x="126"
-         y="308.36218">USB Event</tspan></text>
+         y="168.36218">USB Event</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:8,8;stroke-dashoffset:0"
        d="m 380,72.362183 0,239.999997"
@@ -351,17 +351,17 @@
     <text
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="456"
-       y="332.36218"
+       x="316"
+       y="164.36218"
        id="text5932"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5934"
-         x="456"
-         y="332.36218">Load</tspan><tspan
+         x="316"
+         y="164.36218">Load</tspan><tspan
          sodipodi:role="line"
-         x="456"
-         y="357.36218"
+         x="316"
+         y="189.36218"
          id="tspan5936">Command</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
@@ -371,17 +371,17 @@
     <text
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="440"
-       y="408.36218"
+       x="308"
+       y="266.36218"
        id="text6122"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan6124"
-         x="440"
-         y="408.36218">Save</tspan><tspan
+         x="308"
+         y="266.36218">Save</tspan><tspan
          sodipodi:role="line"
-         x="440"
-         y="433.36218"
+         x="308"
+         y="291.36218"
          id="tspan6126">Command</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1.11803401px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"

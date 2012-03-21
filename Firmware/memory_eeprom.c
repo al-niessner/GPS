@@ -37,8 +37,12 @@ void          eeprom_write (unsigned char address, unsigned char data)
     EEADR = address;
     EEDATA = data;
     EECON1 = 0b00000100;    //Setup writes: EEPGD=0,WREN=1
+    INTCONbits.GIEH = 0;
+    INTCONbits.GIEL = 0;    
     EECON2 = 0x55;
     EECON2 = 0xAA;
     EECON1bits.WR = 1;
+    INTCONbits.GIEH = 1;
+    INTCONbits.GIEL = 1;
     while(EECON1bits.WR);       //Wait till WR bit is clear
 }

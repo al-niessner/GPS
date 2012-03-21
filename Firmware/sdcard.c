@@ -127,14 +127,14 @@ typedef union
 } sd_mbr_t;
 
 
+#pragma udata overlay gps_sdcard
+static sdcard_shared_block_t sdcard;
+
 #pragma udata
 
 static sd_mbr_t          mbr;
 static sd_response_t     reply;
 static unsigned char     version;
-static unsigned char     cid[16];
-static unsigned char     csd[16];
-static unsigned long int read_page, total_pages, write_page;
 
 
 #pragma code
@@ -174,13 +174,13 @@ void sdcard_load_mbr (void)
   static unsigned char crcv[4];
   static unsigned char mbr_i;
 
-  read_page  = 0;
-  write_page = 0;
+  sdcard.read_page  = 0;
+  sdcard.write_page = 0;
   for (mbr_i = 0 ; mbr_i < sizeof (sd_mbr_t) ; mbr_i++) 
     mbr._byte[mbr_i] = eeprom_read (SD_CIRC_BUFF_INDICES_ADDR + mbr_i);
-  mbr_b = mbr._byte[0] == cid[0];
+  mbr_b = mbr._byte[0] == sdcard.cid[0];
   for (mbr_i = 1 ; mbr_i < 5u ; mbr_i++)
-    mbr_b &= mbr._byte[mbr_i] == cid[mbr_i + 8];
+    mbr_b &= mbr._byte[mbr_i] == sdcard.cid[mbr_i + 8];
 
   if (mbr_b)
     {
@@ -194,49 +194,49 @@ void sdcard_load_mbr (void)
         }
 
       if (mbr.read_crc_1 == mbr.read_crc_2 &&
-          mbr.read_crc_1 ==     crcv[0]       ) read_page = mbr.read_page_1;
+          mbr.read_crc_1 ==     crcv[0]       ) sdcard.read_page = mbr.read_page_1;
       else
         {
           if (crcv[0] == mbr.read_crc_1 &&
-              crcv[1] != mbr.read_crc_2    ) read_page = mbr.read_page_1;
+              crcv[1] != mbr.read_crc_2    ) sdcard.read_page = mbr.read_page_1;
 
           if (crcv[0] != mbr.read_crc_1 &&
-              crcv[1] == mbr.read_crc_2    ) read_page = mbr.read_page_2;
+              crcv[1] == mbr.read_crc_2    ) sdcard.read_page = mbr.read_page_2;
 
           if (crcv[0] == mbr.read_crc_1 &&
               crcv[1] == mbr.read_crc_2    )
             {
               if (mbr.read_page_1 + 1 == mbr.read_page_2)
-                read_page = mbr.read_page_2;
-              else read_page = mbr.read_page_1;
+                sdcard.read_page = mbr.read_page_2;
+              else sdcard.read_page = mbr.read_page_1;
             }
         }
 
       if (mbr.write_crc_1 == mbr.write_crc_2 &&
-          mbr.write_crc_1 ==     crcv[2]        ) write_page = mbr.write_page_1;
+          mbr.write_crc_1 ==     crcv[2]        ) sdcard.write_page = mbr.write_page_1;
       else
         {
           if (crcv[2] == mbr.write_crc_1 &&
-              crcv[3] != mbr.write_crc_2    ) write_page = mbr.write_page_1;
+              crcv[3] != mbr.write_crc_2    ) sdcard.write_page = mbr.write_page_1;
 
           if (crcv[2] != mbr.write_crc_1 &&
-              crcv[3] == mbr.write_crc_2    ) write_page = mbr.write_page_2;
+              crcv[3] == mbr.write_crc_2    ) sdcard.write_page = mbr.write_page_2;
 
           if (crcv[2] == mbr.write_crc_1 &&
               crcv[3] == mbr.write_crc_2    )
             {
               if (mbr.write_page_1 + 1 == mbr.write_page_2)
-                write_page = mbr.write_page_2;
-              else write_page = mbr.write_page_1;
+                sdcard.write_page = mbr.write_page_2;
+              else sdcard.write_page = mbr.write_page_1;
             }
         }
     }
   else
     {
       // save off current SD Card information for next boot cycle
-      eeprom_write (SD_CIRC_BUFF_INDICES_ADDR, cid[0]);
+      eeprom_write (SD_CIRC_BUFF_INDICES_ADDR, sdcard.cid[0]);
       for (mbr_i = 1 ; mbr_i < 5u ; mbr_i++)
-        eeprom_write (SD_CIRC_BUFF_INDICES_ADDR + mbr_i, cid[8 + mbr_i]);
+        eeprom_write (SD_CIRC_BUFF_INDICES_ADDR + mbr_i, sdcard.cid[8 + mbr_i]);
     }
 }
 
@@ -309,7 +309,7 @@ void sdcard_proc_block (sd_command_t c, unsigned int arg, unsigned char *block)
     {
     case SD_SEND_CID:
     case SD_SEND_CSD:
-      count = sizeof (csd);
+      count = sizeof (sdcard.csd);
       break;
 
     default:
@@ -360,11 +360,11 @@ void sdcard_update_mbr(void)
 {
   static unsigned char idx, read_crc, write_crc;
 
-  if (total_pages <= read_page)  read_page = 0;
-  if (total_pages <= write_page) write_page = 0;
+  if (sdcard.total_pages <= sdcard.read_page)  sdcard.read_page = 0;
+  if (sdcard.total_pages <= sdcard.write_page) sdcard.write_page = 0;
 
-  mbr.read_page_1  = mbr.read_page_2  = read_page;
-  mbr.write_page_1 = mbr.write_page_2 = write_page;
+  mbr.read_page_1  = mbr.read_page_2  = sdcard.read_page;
+  mbr.write_page_1 = mbr.write_page_2 = sdcard.write_page;
   read_crc = write_crc = 0;
   for (idx = 0 ; idx < 4u ; idx++) 
     {
@@ -379,15 +379,10 @@ void sdcard_update_mbr(void)
 
 void sdcard_erase(void)
 {
-  read_page = write_page;
+  sdcard.read_page = sdcard.write_page;
   sdcard_update_mbr();
 }
 
-unsigned char*    sdcard_get_CID(void)         { return cid; }
-unsigned char*    sdcard_get_CSD(void)         { return csd; }
-unsigned long int sdcard_get_read_page(void)   { return read_page; }
-unsigned long int sdcard_get_write_page(void)  { return write_page; }
-unsigned long int sdcard_get_total_pages(void) { return total_pages; }
 unsigned int sdcard_get_status(void)
 {
   sdcard_process (SD_SEND_STATUS, 0x0u, R2);
@@ -404,9 +399,9 @@ void sdcard_initialize(void)
   acmd41_arg = 0x00u;
   version = 0x00u;
   reply.val[0] = 0x80;
-  read_page   = 0;
-  total_pages = 0;
-  write_page  = 0;
+  sdcard.read_page   = 0;
+  sdcard.total_pages = 0;
+  sdcard.write_page  = 0;
   SD_CS_INIT();
   Delay1KTCYx (0); // make sure power has been on for 1 ms
   OpenSPI (SPI_FOSC_64, MODE_00, SMPEND); // initial contact must be < 400 KHz
@@ -476,21 +471,22 @@ void sdcard_initialize(void)
 
       // make all cards compatible since SDCH/X cards are fixed at 512 anyway
       sdcard_process (SD_SET_BLOCKLEN, SD_PAGE_SIZE, R1);
-      for (i = 0 ; i < sizeof (cid) ; i++) cid[i] = csd[i] = 0x00u;
-      sdcard_proc_block (SD_SEND_CID, 0x0, cid);
+      for (i = 0 ; i < sizeof (sdcard.cid) ; i++) sdcard.cid[i] = sdcard.csd[i] = 0x00u;
+      sdcard_proc_block (SD_SEND_CID, 0x0, sdcard.cid);
       fifo_broadcast_sdcard_usb (SD_CID_READ, reply.val[0], version);
 
       if (reply.val[0] != 0x0u && sdcard_get_status() != 0x00u) return;
 
-      sdcard_proc_block (SD_SEND_CSD, 0x0, csd);
+      sdcard_proc_block (SD_SEND_CSD, 0x0, sdcard.csd);
       fifo_broadcast_sdcard_usb (SD_CSD_READ, reply.val[0], version);
 
       if (reply.val[0] != 0x0u && sdcard_get_status() != 0x00u) return;
 
       if (version == 2u)
-        total_pages = (((unsigned long int)csd[9]         |
-                       (((unsigned long int)csd[8]) << 8) |
-                        (((unsigned long int)(csd[7] & 0x3f)) << 16)) + 1) <<10;
+        sdcard.total_pages = (((unsigned long int)sdcard.csd[9]         |
+                              (((unsigned long int)sdcard.csd[8]) << 8) |
+                               (((unsigned long int)(sdcard.csd[7] & 0x3f))
+                                << 16)) + 1) <<10;
       sdcard_load_mbr();
       fifo_broadcast_sdcard_usb (sdsc ? SD_INIT_DONE_SDSC : SD_INIT_DONE_SDSH_X,
                                  reply.val[0], version);
@@ -503,8 +499,8 @@ void sdcard_read (unsigned char *pages, unsigned char page_count)
 
   for (pc = 0 ; pc < page_count ; pc++)
     {
-      sdcard_proc_block (SD_READ_BLOCK, read_page, &pages[pc * SD_PAGE_SIZE]);
-      read_page++;
+      sdcard_proc_block (SD_READ_BLOCK, sdcard.read_page, &pages[pc * SD_PAGE_SIZE]);
+      sdcard.read_page++;
       sdcard_update_mbr();
     }
 }
@@ -515,8 +511,8 @@ void sdcard_write (unsigned char *pages, unsigned char page_count)
 
   for (pc = 0 ; pc < page_count ; pc++)
     {
-      sdcard_proc_block (SD_WRITE_BLOCK, write_page, &pages[pc * SD_PAGE_SIZE]);
-      write_page++;
+      sdcard_proc_block (SD_WRITE_BLOCK, sdcard.write_page, &pages[pc * SD_PAGE_SIZE]);
+      sdcard.write_page++;
       sdcard_update_mbr();
     }
 }

@@ -28,39 +28,40 @@
 #include "sdcard.h"
 #include "usb.h"
 
-#pragma udata
 
+#pragma udata overlay gps_fsm
+static fsm_shared_block_t fsm;
+
+#pragma udata overlay gps_sdcard
+static sdcard_shared_block_t sdcard;
+
+#pragma udata overlay gps_usb
+static usb_shared_block_t usb;
+
+
+#pragma udata
 static bool_t basic;
-static fsm_state_t current   = INDETERMINATE,
-                   requested = UNDEFINED,
-                   required  = UNDEFINED;
-static unsigned int duration[2] = {0, 0};
-static user_request_t user_req;
-static usb_data_packet_t send_msg;
+static unsigned char duration[2] = {0, 0};
+
 
 #pragma code
 
-fsm_state_t fsm_adjust (fsm_state_t desire)
+void fsm_adjust (void)
 {
-  static fsm_state_t next;
-  next = desire;
-
-  if (required < UNDEFINED)
+  if (fsm.required < UNDEFINED)
     {
-      next = required;
-      required = UNDEFINED;
+      fsm.current  = fsm.required;
+      fsm.required = UNDEFINED;
     }
 
-  if (requested < UNDEFINED && (next == S0 || next == S2))
+  if (fsm.requested < UNDEFINED && (fsm.next == S0 || fsm.next == S1))
     {
-      next = requested;
-      requested = UNDEFINED;
+      fsm.current   = fsm.requested;
+      fsm.requested = UNDEFINED;
     }
-
-  return next;
 }
 
-fsm_state_t fsm_clear(void)
+void fsm_clear(void)
 {
   if (duration[0] == 3u && duration[1] == 3u)
     {
@@ -70,21 +71,20 @@ fsm_state_t fsm_clear(void)
       sdcard_erase();
     }
 
-  return S0;
+  fsm.next = S0;
 }
 
-fsm_state_t fsm_idle (bool_t full)
+void fsm_idle (bool_t full)
 {
   static bool_t two_button_action;
   static button_event_t be[2];
-  static fsm_state_t next;
 
-  next = full ? S1:S0;
+  fsm.next = full ? S1:S0;
   basic = !full;
   fifo_set_allow (full);
 
-  if      (fifo_waiting_usb())  next = S5;
-  else if (fifo_is_receiving()) next = full ? S4:S0;
+  if      (fifo_waiting_usb())  fsm.next = S5;
+  else if (fifo_is_receiving()) fsm.next = full ? S4:S0;
   else if (fifo_fetch_time_event (be))
     {
       // update duration or generate events if duration is surpassed
@@ -95,38 +95,36 @@ fsm_state_t fsm_idle (bool_t full)
 
       two_button_action = (be[0] == be[1]) && (duration[1] - duration[0]) == 0u;
 
-      if (two_button_action) next = S6;
+      if (two_button_action) fsm.next = S6;
       else // one button action
         {
-          if (be[0] == SS_HIGH) next = S2;
-          if (be[1] == SS_HIGH) next = S3;
+          if (be[0] == SS_HIGH) fsm.next = S2;
+          if (be[1] == SS_HIGH) fsm.next = S3;
         }
 
       if (duration[0] == 0u && duration[1] == 0u) LED_OFF();
     }
-
-  return next;
 }
 
-fsm_state_t fsm_pop(void)
+void fsm_pop(void)
 {
   // TODO: get the next message from the FIFO and send it back via the USB  
-  return basic ? S0:S1;
+  fsm.next = basic ? S0:S1;
 }
 
-fsm_state_t fsm_push(void)
+void fsm_push(void)
 {
   fifo_set_valid (false);
-  return S1;
+  fsm.next = S1;
 }
 
-fsm_state_t fsm_send(void)
+void fsm_send(void)
 {
   // TODO: send a message to the GPS receiver via the serial bus
-  return basic ? S0:S1;
+  fsm.next = basic ? S0:S1;
 }
 
-fsm_state_t fsm_track(void)
+void fsm_track(void)
 {
   if (duration[0] == 2u)
     {
@@ -134,53 +132,55 @@ fsm_state_t fsm_track(void)
       // TODO: send $PDIYNT„*1E<CR><LF>
     }
 
-  return S1;
+  fsm.next = S1;
 }
 
-fsm_state_t fsm_uart(void)
+void fsm_uart(void)
 {
   fifo_set_valid (true);
-  return fifo_is_receiving() ? S4:S7;
+  fsm.next = fifo_is_receiving() ? S4:S7;
 }
 
-fsm_state_t fsm_usb(void)
+void fsm_usb(void)
 {
-  if (usb_process (&user_req))
+  if (usb_process())
     {
-      switch (user_req.command)
+      switch (usb.inbound.cmd)
         {
         case GPS_REQUEST_CMD:
-          if (user_req.details.force) fsm_set_state (user_req.details.state);
-          else fsm_request_state (user_req.details.state);
+          if (usb.inbound.force) fsm.required = usb.inbound.new_state;
+          else fsm.requested = usb.inbound.new_state;
 
-          if (user_req.details.state == S2)
-            duration[0] = user_req.details.duration;
+          if (usb.inbound.new_state == S2)
+            duration[0] = usb.inbound.duration;
 
-          if (user_req.details.state == S3)
-            duration[1] = user_req.details.duration;
+          if (usb.inbound.new_state == S3)
+            duration[1] = usb.inbound.duration;
 
-          if (user_req.details.state == S6)
+          if (usb.inbound.new_state == S6)
             {
-              duration[0] = user_req.details.duration;
-              duration[1] = user_req.details.duration;
+              duration[0] = usb.inbound.duration;
+              duration[1] = usb.inbound.duration;
             }
+          usb.outbound.cmd = GPS_REQUEST_CMD;
+          fifo_push_usb (1);
           break;
 
         case GPS_SDC_CONFIG_REQ:
-          send_msg.cmd = GPS_SDC_CONFIG_REQ;
-          send_msg.fill = 0;
-          memcpy (send_msg.cid, (const void*)sdcard_get_CID(), 15);
-          memcpy (send_msg.csd, (const void*)sdcard_get_CSD(), 15);
-          fifo_push_usb (&send_msg, USBGEN_EP_SIZE);
+          usb.outbound.cmd = GPS_SDC_CONFIG_REQ;
+          usb.outbound.fill = 0;
+          memcpy (usb.outbound.cid, (const void*)sdcard.cid, 15);
+          memcpy (usb.outbound.csd, (const void*)sdcard.csd, 15);
+          fifo_push_usb (USBGEN_EP_SIZE);
           break;
 
         case GPS_SDC_STATE_REQ:
-          send_msg.cmd = GPS_SDC_STATE_REQ;
-          send_msg.sdc_status = sdcard_get_status();
-          send_msg.next_page_to_read = sdcard_get_read_page();
-          send_msg.next_page_to_write = sdcard_get_write_page();
-          send_msg.total_pages = sdcard_get_total_pages();
-          fifo_push_usb (&send_msg, USBGEN_EP_SIZE);
+          usb.outbound.cmd = GPS_SDC_STATE_REQ;
+          usb.outbound.sdc_status = sdcard_get_status();
+          usb.outbound.next_page_to_read = sdcard.read_page;
+          usb.outbound.next_page_to_write = sdcard.write_page;
+          usb.outbound.total_pages = sdcard.total_pages;
+          fifo_push_usb (USBGEN_EP_SIZE);
           break;
 
         default:
@@ -188,10 +188,10 @@ fsm_state_t fsm_usb(void)
         }
     }
 
-  return S1;
+  fsm.next = basic ? S0:S1;
 }
 
-fsm_state_t fsm_waypt(void)
+void fsm_waypt(void)
 {
   if (duration[1] == 2u)
     {
@@ -199,50 +199,41 @@ fsm_state_t fsm_waypt(void)
       // TODO: send $PDIYWP,*2F<CR><LF>
     }
 
-  return S1;
+  fsm.next = S1;
 }
 
 void fsm_initialize(void)
 {
-  current = S0;
+  fsm.current = S0;
+  fsm.next = S0;
+  fsm.requested = UNDEFINED;
+  fsm.required = UNDEFINED;
   duration[0] = 0;
   duration[1] = 0;
-  requested = UNDEFINED;
-  required = UNDEFINED;
   LED_OFF();
 }
 
 void fsm_process (void)
 {
-  current = fsm_adjust (current);
-  fifo_push_state (current, UNDEFINED, requested, required);
-  switch (current)
+  fsm.current = fsm.next;
+  fsm_adjust();
+  switch (fsm.current)
     {
-    case S0: current = fsm_idle (false); break;
-    case S1: current = fsm_idle (true);  break;
-    case S2: current = fsm_track();      break;
-    case S3: current = fsm_waypt();      break;
-    case S4: current = fsm_uart ();      break;
-    case S5: current = fsm_usb  ();      break;
-    case S6: current = fsm_clear();      break;
-    case S7: current = fsm_push ();      break;
-    case S8: current = fsm_send ();      break;
-    case S9: current = fsm_pop  ();      break;
+    case S0: fsm_idle (false); break;
+    case S1: fsm_idle (true);  break;
+    case S2: fsm_track();      break;
+    case S3: fsm_waypt();      break;
+    case S4: fsm_uart ();      break;
+    case S5: fsm_usb  ();      break;
+    case S6: fsm_clear();      break;
+    case S7: fsm_push ();      break;
+    case S8: fsm_send ();      break;
+    case S9: fsm_pop  ();      break;
 
     case UNDEFINED:
     case INDETERMINATE:
-      current = INDETERMINATE;
+      if (fifo_waiting_usb()) fsm_usb(); // keep the USB alive
+      fsm.next = INDETERMINATE;
       break;
     }
-  fifo_push_state (UNDEFINED, current, requested, required);
-}
-
-void fsm_request_state (fsm_state_t state)
-{
-  if (state < UNDEFINED) requested = state;
-}
-
-void fsm_set_state (fsm_state_t state)
-{
-  if (state < UNDEFINED) required = state;
 }
