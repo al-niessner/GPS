@@ -33,6 +33,8 @@
 #include "memory_eeprom.h"
 #include "sdcard.h"
 
+#define SD_PAGE_SIZE (0x200u)
+
 typedef enum { SD_GO_IDLE_STATE    = 0x40,// CMD0   0x00
                SD_SEND_IF_COND     = 0x48,// CMD8
                SD_SEND_CSD         = 0x49,// CMD9
@@ -132,9 +134,10 @@ static sdcard_shared_block_t sdcard;
 
 #pragma udata
 
-static sd_mbr_t          mbr;
-static sd_response_t     reply;
-static unsigned char     version;
+static sd_mbr_t      mbr;
+static sd_response_t reply;
+static unsigned char version;
+static unsigned int  offset;
 
 
 #pragma code
@@ -300,24 +303,12 @@ void sdcard_process (sd_command_t c,
 }
 
 // length is determined from command.
-void sdcard_proc_block (sd_command_t c, unsigned int arg, unsigned char *block)
+void sdcard_proc_block (sd_command_t c, unsigned char *block)
 {
   static sd_crc16_t crc, expected;
-  static unsigned int count, i;
+  static unsigned int i;
 
-  switch (c)
-    {
-    case SD_SEND_CID:
-    case SD_SEND_CSD:
-      count = sizeof (sdcard.csd);
-      break;
-
-    default:
-      count = SD_PAGE_SIZE;
-      break;
-    }
-
-  sdcard_process (c, arg, R1);
+  sdcard_process (c, 0x0, R1);
   SD_CS = 0;
   crc.value = 0;
   block[0] = 0;
@@ -328,7 +319,7 @@ void sdcard_proc_block (sd_command_t c, unsigned int arg, unsigned char *block)
     {
       if (c == SD_WRITE_BLOCK)
         {
-          for (i = 0 ; i < count && i < SD_PAGE_SIZE ; i++)
+          for (i = 0 ; i < 0x10u ; i++)
             {
               putcSPI (block[i]);
               crc.value = sdcard_crc16 (block[i], crc.value);
@@ -339,7 +330,7 @@ void sdcard_proc_block (sd_command_t c, unsigned int arg, unsigned char *block)
         }
       else // read data block from SD Card
       {
-          for (i = 0 ; i < count && i < SD_PAGE_SIZE ; i++)
+          for (i = 0 ; i < 0x10u ; i++)
             {
               block[i] = getcSPI();
               crc.value = sdcard_crc16 (block[i], crc.value);
@@ -377,8 +368,24 @@ void sdcard_update_mbr(void)
     eeprom_write (SD_CIRC_BUFF_INDICES_ADDR + idx, mbr._byte[idx]);
 }
 
+void sdcard_complete_block (void)
+{
+  if (offset & 0x8000) 
+    {
+      while (offset & 0x1ff) sdcard_write (0x0);
+    }
+
+  if (offset & 0x4000)
+    {
+      while (offset & 0x1ff) sdcard_read();
+    }
+
+  offset = 0;
+}
+
 void sdcard_erase(void)
 {
+  sdcard_complete_block();
   sdcard.read_page = sdcard.write_page;
   sdcard_update_mbr();
 }
@@ -402,6 +409,7 @@ void sdcard_initialize(void)
   sdcard.read_page   = 0;
   sdcard.total_pages = 0;
   sdcard.write_page  = 0;
+  offset = 0;
   SD_CS_INIT();
   Delay1KTCYx (0); // make sure power has been on for 1 ms
   OpenSPI (SPI_FOSC_64, MODE_00, SMPEND); // initial contact must be < 400 KHz
@@ -472,12 +480,12 @@ void sdcard_initialize(void)
       // make all cards compatible since SDCH/X cards are fixed at 512 anyway
       sdcard_process (SD_SET_BLOCKLEN, SD_PAGE_SIZE, R1);
       for (i = 0 ; i < sizeof (sdcard.cid) ; i++) sdcard.cid[i] = sdcard.csd[i] = 0x00u;
-      sdcard_proc_block (SD_SEND_CID, 0x0, sdcard.cid);
+      sdcard_proc_block (SD_SEND_CID, sdcard.cid);
       fifo_broadcast_sdcard_usb (SD_CID_READ, reply.val[0], version);
 
       if (reply.val[0] != 0x0u && sdcard_get_status() != 0x00u) return;
 
-      sdcard_proc_block (SD_SEND_CSD, 0x0, sdcard.csd);
+      sdcard_proc_block (SD_SEND_CSD, sdcard.csd);
       fifo_broadcast_sdcard_usb (SD_CSD_READ, reply.val[0], version);
 
       if (reply.val[0] != 0x0u && sdcard_get_status() != 0x00u) return;
@@ -493,26 +501,30 @@ void sdcard_initialize(void)
     }
 }
 
-void sdcard_read (unsigned char *pages, unsigned char page_count)
+unsigned char sdcard_read (void)
 {
-  static unsigned char pc;
+  unsigned char result;
 
-  for (pc = 0 ; pc < page_count ; pc++)
-    {
-      sdcard_proc_block (SD_READ_BLOCK, sdcard.read_page, &pages[pc * SD_PAGE_SIZE]);
-      sdcard.read_page++;
-      sdcard_update_mbr();
-    }
+  if (offset & 0x8000) sdcard_complete_block();
+
+  offset &= 0x1ff;
+  if (0u < offset) offset |= 0x4000;
+
+  return result;
 }
 
-void sdcard_write (unsigned char *pages, unsigned char page_count)
+void sdcard_write (unsigned char c)
 {
-  static unsigned char pc;
+  if (offset & 0x4000) sdcard_complete_block();
+  else offset &= 0x1ff;
 
-  for (pc = 0 ; pc < page_count ; pc++)
-    {
-      sdcard_proc_block (SD_WRITE_BLOCK, sdcard.write_page, &pages[pc * SD_PAGE_SIZE]);
-      sdcard.write_page++;
-      sdcard_update_mbr();
+  if (offset == 0u)
+    { // new block
+      offset = SD_PAGE_SIZE;
+    }
+
+  if (0u < offset) offset |= 0x8000;
+  else
+    { // close the block
     }
 }
