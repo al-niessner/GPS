@@ -36,7 +36,7 @@ typedef enum { false=0==1, true=0==0 } bool_t;
   * somewhere along the way and the FSM is now in a bad state.
  **/
 
-typedef enum { S0=0, S1, S2, S3, S4, S5, S6, S7, S8, S9,
+typedef enum { S0=0, S1, S2, S3, S4, S5, S6, S7, S8,
                UNDEFINED=0xfe, INDETERMINATE=0xff } fsm_state_t;
 
 typedef struct fsm_shared_block
@@ -98,8 +98,10 @@ typedef enum
   GPS_REQUEST_CMD    = 0x81,  // Set the state
   GPS_STATE_REQ      = 0x82,  // Get the current and next state and timing
   GPS_SDC_CONFIG_REQ = 0x83,  // Get the CDS and CIS from the SD Card
-  GPS_SDC_STATE_REQ = 0x84,  // Get the status, last read, and last written
-
+  GPS_SDC_STATE_REQ  = 0x84,  // Get the status, last read, and last written
+  GPS_POP            = 0x85,  // Pop a USB buffer full from the stack
+  GPS_PUSH           = 0x86,  // Push a USB buffer onto the SD Card
+  GPS_SEND           = 0x87,  // Send a command string to the GPS unit
   RESET_CMD          = 0xff   // Cause a power-on reset.
 } usb_cmd_t;
 
@@ -167,6 +169,13 @@ typedef union usb_data_packet
     unsigned long int next_page_to_write;
     unsigned long int total_pages;
     unsigned char unused[USBGEN_EP_SIZE - 13];
+  };
+
+  struct // GPS_PUSH and GPS_SEND
+  {
+    usb_cmd_t cmd;
+    unsigned char len;
+    unsigned char data_block[30];
   };
 
   struct // EEPROM read/write structure

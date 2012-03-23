@@ -28,10 +28,12 @@
 #include "sdcard.h"
 #include "usb.h"
 
-
+#define MSG_SIZE 0x0fu
+#define POP_ERR 0x1du
 #pragma romdata
-static const far rom char new_track[]    = "\r\n$PDIYNT,*1E\r\na";
-static const far rom char new_waypoint[] = "\r\n$PDIYWP,*2F\r\na";
+static const far rom char new_track[MSG_SIZE + 1]    = "\r\n$PDIYNT,*1E\r\n";
+static const far rom char new_waypoint[MSG_SIZE + 1] = "\r\n$PDIYWP,*2F\r\n";
+static const far rom char pop_err_msg[POP_ERR + 1] = "Must be in S0 to GPS_POP/PUSH";
 
 #pragma udata overlay gps_fsm
 static fsm_shared_block_t fsm;
@@ -47,13 +49,11 @@ static usb_shared_block_t usb;
 static bool_t basic;
 static unsigned char duration[2] = {0, 0};
 static unsigned char idx, val;
-static unsigned int rate;
 
 #pragma code
 
 void fsm_clear(void)
 {
-  rate = 0x40;
   if (duration[0] == 3u && duration[1] == 3u)
     {
       LED_ON();
@@ -97,12 +97,6 @@ void fsm_idle (bool_t full)
     }
 }
 
-void fsm_pop(void)
-{
-  // TODO: get the next message from the FIFO and send it back via the USB  
-  fsm.next = basic ? S0:S1;
-}
-
 void fsm_push(void)
 {
   fifo_set_valid (false);
@@ -117,11 +111,10 @@ void fsm_send(void)
 
 void fsm_track(void)
 {
-  rate = 0x20;
   if (duration[0] == 2u)
     {
       LED_ON();
-      for (idx = 0 ; idx < 0x10u ; idx++)
+      for (idx = 0 ; idx < MSG_SIZE ; idx++)
         {
           memcpypgm2ram ((void*)&val, (const far rom void*)&new_track[idx], 1);
           sdcard_write (val);
@@ -177,6 +170,40 @@ void fsm_usb(void)
           fifo_push_usb (USBGEN_EP_SIZE);
           break;
 
+        case GPS_POP:
+          if (basic)
+            for (idx = 0 ; idx < USBGEN_EP_SIZE ; idx++)
+              usb.outbound._byte[idx] = sdcard_read();
+          else
+            memcpypgm2ram ((void*)&usb.outbound._byte,
+                           (const far rom void*)pop_err_msg,
+                           POP_ERR + 1);
+
+          fifo_push_usb (USBGEN_EP_SIZE);
+          break;
+
+        case GPS_PUSH:
+          if (basic)
+            {
+              for (idx = 0 ; idx < usb.inbound.len ; idx++)
+                sdcard_write (usb.inbound.data_block[idx]);
+              usb.outbound.len = 0;
+            }
+          else
+            {
+              usb.outbound.len = POP_ERR;
+              memcpypgm2ram (&usb.outbound._byte[2],
+                             (const far rom void*)pop_err_msg,
+                             POP_ERR);
+            }
+
+          usb.outbound.cmd = GPS_PUSH;
+          fifo_push_usb (usb.outbound.len + 2);
+          break;
+
+        case GPS_SEND:
+          break;
+
         default:
           break;
         }
@@ -187,11 +214,10 @@ void fsm_usb(void)
 
 void fsm_waypt(void)
 {
-  rate = 0x10;
   if (duration[1] == 2u)
     {
       LED_ON();
-      for (idx = 0 ; idx < 0xfu ; idx++)
+      for (idx = 0 ; idx < MSG_SIZE ; idx++)
         {
           memcpypgm2ram ((void*)&val,
                          (const far rom void*)&new_waypoint[idx], 1);
@@ -204,7 +230,6 @@ void fsm_waypt(void)
 
 void fsm_initialize(void)
 {
-  rate = 0x40;
   fsm.current = S0;
   fsm.next = S0;
   fsm.requested = UNDEFINED;
@@ -214,7 +239,7 @@ void fsm_initialize(void)
   LED_OFF();
 }
 
-unsigned int fsm_process (void)
+void fsm_process (void)
 {
   fsm.current = fsm.next;
 
@@ -234,14 +259,13 @@ unsigned int fsm_process (void)
     {
     case S0: fsm_idle (false); break;
     case S1: fsm_idle (true);  break;
-    case S2: fsm_track();      break;
-    case S3: fsm_waypt();      break;
+    case S2: fsm_track();      break; // tested
+    case S3: fsm_waypt();      break; // tested
     case S4: fsm_uart ();      break;
-    case S5: fsm_usb  ();      break;
-    case S6: fsm_clear();      break;
+    case S5: fsm_usb  ();      break; // tested
+    case S6: fsm_clear();      break; // tested
     case S7: fsm_push ();      break;
     case S8: fsm_send ();      break;
-    case S9: fsm_pop  ();      break;
 
     case UNDEFINED:
     case INDETERMINATE:
@@ -249,6 +273,4 @@ unsigned int fsm_process (void)
       fsm.next = INDETERMINATE;
       break;
     }
-
-  return rate;
 }

@@ -116,7 +116,7 @@ void main(void)
       usb_handle();
 #endif
       fifo_broadcast_state_usb (cost);
-      led_rate = fsm_process();
+      fsm_process();
     }
 }
 

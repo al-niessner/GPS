@@ -76,14 +76,11 @@ bool_t usb_process (void)
       switch (usb.inbound.cmd)
         {
         case GPS_REQUEST_CMD:
-          do_more = true;
-          break;
-
         case GPS_SDC_CONFIG_REQ:
-          do_more = true;
-          break;
-
         case GPS_SDC_STATE_REQ:
+        case GPS_POP:
+        case GPS_PUSH:
+        case GPS_SEND:
           do_more = true;
           break;
 

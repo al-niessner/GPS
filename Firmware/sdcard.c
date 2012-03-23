@@ -594,11 +594,9 @@ void sdcard_write (unsigned char c)
           sdcard_update_mbr();
         }
 
-      for (bidx = 0xffff ; bidx & (result != 0xff) ; bidx--)
-        {
-          putcSPI(SD_NULL);
-          result = getcSPI();
-        }
+      while (result != 0xff) result = getcSPI();
+      for (bidx = 0xffff ; bidx & sdcard_get_status() ; bidx--)
+        putcSPI(SD_NULL);
     }
   SD_CS = 1;
 }
