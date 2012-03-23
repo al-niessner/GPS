@@ -31,7 +31,7 @@
 #define GPS_PRODUCT_ID 0x00,0x03
 
 #pragma romdata
-static const rom usb_device_info_t usb_dev_info =
+static const far rom usb_device_info_t usb_dev_info =
   {
     GPS_PRODUCT_ID,
     GPS_MAJOR_VERSION, GPS_MINOR_VERSION, GPS_BUGFIX_VERSION,
@@ -91,7 +91,7 @@ bool_t usb_process (void)
           // Return a packet with information about this USB interface device.
           usb.outbound.cmd = usb.inbound.cmd;
           memcpypgm2ram ((void*)&usb.outbound.info,
-                         (const rom void*)&usb_dev_info,
+                         (const far rom void*)&usb_dev_info,
                          sizeof (usb_device_info_t));
           num_return_bytes  = sizeof (usb_device_info_t) + 1;
           break;

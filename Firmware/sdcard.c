@@ -377,8 +377,7 @@ void sdcard_erase(void)
 unsigned int sdcard_get_status(void)
 {
   sdcard_complete_block();
-  cmd = SD_SEND_STATUS;
-  arg = 0x0;
+  cmd = SD_SEND_STATUS; arg = 0x0;
   sdcard_process (R2);
   return reply.r2_val;
 }
@@ -515,6 +514,7 @@ unsigned char sdcard_read (void)
       result = 0;
       for (bidx = 0xff ; bidx &&(reply.val[0] == 0u && result != 0xfe) ; bidx--)
         result = getcSPI(); // wait for start bit
+      fifo_broadcast_xfer_usb (true, reply.val[0], result == 0xfeu);
 
       if (result == 0xfeu) offset = SD_PAGE_SIZE;
       else offset = 0;
@@ -553,20 +553,26 @@ void sdcard_write (unsigned char c)
 
   if (offset == 0u)
     { // new block
-      cmd = SD_WRITE_BLOCK;  cmd = sdcard.write_page;
+      cmd = SD_WRITE_BLOCK;  arg = sdcard.write_page;
       sdcard_process (R1);
       SD_CS = 0;
       crc.value = 0;
-      result = 0;
-      for (bidx = 0xff ; bidx &&(reply.val[0] == 0u && result != 0xfe) ; bidx--)
-        result = getcSPI(); // wait for start bit
-      
-      if (result == 0xfeu) offset = SD_PAGE_SIZE;
-      else offset = 0;
+      fifo_broadcast_xfer_usb (false, reply.val[0], true);
+
+      if (reply.val[0] == 0x0u)
+        {
+          offset = SD_PAGE_SIZE;
+          putcSPI (0xfe);
+        }
+      else
+        {
+          offset = 0;
+          SD_CS = 1;
+        }
     }
   else result = 0xfeu;
 
-  if (result == 0xfeu)
+  if (0u < offset)
     {
       SD_CS = 0;
       putcSPI (c);
@@ -575,17 +581,24 @@ void sdcard_write (unsigned char c)
     }
 
   if (0u < offset) offset |= 0x8000;
-  else
+  else if (SD_CS == 0u)
     { // close the block
       putcSPI (crc._byte[1]);
       putcSPI (crc._byte[0]);
-      putcSPI (0xff); // last bit must be high
-      for (bidx = 0xffff ; bidx && sdcard_get_status() ; bidx--)
-        putcSPI(SD_NULL);
-      fifo_broadcast_xfer_usb (false, reply.val[0], true);
-      sdcard.write_page++;
-      sdcard_update_mbr();
-    }
+      result = getcSPI();
+      fifo_broadcast_xfer_usb (false, result, (result & 0x0e) == 0x04u);
 
+      if ((result & 0x0e) == 0x04u)
+        {
+          sdcard.write_page++;
+          sdcard_update_mbr();
+        }
+
+      for (bidx = 0xffff ; bidx & (result != 0xff) ; bidx--)
+        {
+          putcSPI(SD_NULL);
+          result = getcSPI();
+        }
+    }
   SD_CS = 1;
 }

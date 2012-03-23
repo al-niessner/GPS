@@ -30,8 +30,8 @@
 
 
 #pragma romdata
-static const rom char new_track[]    = "\r\n$PDIYNT,*1E\r\n";
-static const rom char new_waypoint[] = "\r\n$PDIYWP,*2F\r\n";
+static const far rom char new_track[]    = "\r\n$PDIYNT,*1E\r\na";
+static const far rom char new_waypoint[] = "\r\n$PDIYWP,*2F\r\na";
 
 #pragma udata overlay gps_fsm
 static fsm_shared_block_t fsm;
@@ -46,7 +46,7 @@ static usb_shared_block_t usb;
 #pragma udata
 static bool_t basic;
 static unsigned char duration[2] = {0, 0};
-static unsigned char idx;
+static unsigned char idx, val;
 static unsigned int rate;
 
 #pragma code
@@ -121,7 +121,11 @@ void fsm_track(void)
   if (duration[0] == 2u)
     {
       LED_ON();
-      for (idx = 0 ; idx < 0xfu ; idx++) sdcard_write (new_track[idx]);
+      for (idx = 0 ; idx < 0x10u ; idx++)
+        {
+          memcpypgm2ram ((void*)&val, (const far rom void*)&new_track[idx], 1);
+          sdcard_write (val);
+        }
     }
 
   fsm.next = S1;
@@ -187,7 +191,12 @@ void fsm_waypt(void)
   if (duration[1] == 2u)
     {
       LED_ON();
-      for (idx = 0 ; idx < 0xfu ; idx++) sdcard_write (new_waypoint[idx]);
+      for (idx = 0 ; idx < 0xfu ; idx++)
+        {
+          memcpypgm2ram ((void*)&val,
+                         (const far rom void*)&new_waypoint[idx], 1);
+          sdcard_write (val);
+        }
     }
 
   fsm.next = S1;
