@@ -393,30 +393,6 @@
          x="404.20551"
          y="268.28101">input from USB</tspan></text>
     <g
-       transform="translate(442.20842,809.42481)"
-       id="g3144-4-5-9">
-      <path
-         d="m 102.76974,69.198296 c 0,11.73002 -9.509057,21.23908 -21.239077,21.23908 -11.730021,0 -21.239081,-9.50906 -21.239081,-21.23908 0,-11.730021 9.50906,-21.239081 21.239081,-21.239081 11.73002,0 21.239077,9.50906 21.239077,21.239081 z"
-         sodipodi:ry="21.23908"
-         sodipodi:rx="21.23908"
-         sodipodi:cy="69.198296"
-         sodipodi:cx="81.530663"
-         id="path3138-7-1-1"
-         style="fill:#00ffff;fill-opacity:1;stroke:#00ff00;stroke-width:5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         sodipodi:type="arc" />
-      <text
-         sodipodi:linespacing="125%"
-         id="text3140-7-10-4"
-         y="73.994217"
-         x="72.623955"
-         style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-         xml:space="preserve"><tspan
-           y="73.994217"
-           x="72.623955"
-           id="tspan3142-5-8-3"
-           sodipodi:role="line">S9</tspan></text>
-    </g>
-    <g
        transform="translate(292.20842,609.42481)"
        id="g3144-4-5-9-0">
       <path
@@ -439,30 +415,6 @@
            x="72.623955"
            id="tspan3142-5-8-3-4"
            sodipodi:role="line">S7</tspan></text>
-    </g>
-    <g
-       transform="translate(592.20842,609.42481)"
-       id="g3144-4-5-9-3">
-      <path
-         d="m 102.76974,69.198296 c 0,11.73002 -9.509057,21.23908 -21.239077,21.23908 -11.730021,0 -21.239081,-9.50906 -21.239081,-21.23908 0,-11.730021 9.50906,-21.239081 21.239081,-21.239081 11.73002,0 21.239077,9.50906 21.239077,21.239081 z"
-         sodipodi:ry="21.23908"
-         sodipodi:rx="21.23908"
-         sodipodi:cy="69.198296"
-         sodipodi:cx="81.530663"
-         id="path3138-7-1-1-1"
-         style="fill:#00ffff;fill-opacity:1;stroke:#00ff00;stroke-width:5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         sodipodi:type="arc" />
-      <text
-         sodipodi:linespacing="125%"
-         id="text3140-7-10-4-2"
-         y="73.994217"
-         x="72.623955"
-         style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-         xml:space="preserve"><tspan
-           y="73.994217"
-           x="72.623955"
-           id="tspan3142-5-8-3-2"
-           sodipodi:role="line">S8</tspan></text>
     </g>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
@@ -636,30 +588,6 @@
          id="tspan8449"
          x="500.32404"
          y="50.376347">always</tspan></text>
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
-       d="M 524.4038,854.37299 C 543.57304,661.50976 670.2339,461.3999 393.30285,288.49848"
-       id="path3886"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
-       d="M 671.55793,655.04604 C 566.57416,342.09541 484.34128,356.75751 395.97838,283.14742"
-       id="path4076"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
-       d="M 524.4038,853.03523 C 618.33541,597.80749 642.01995,344.01336 389.28956,95.860351"
-       id="path4078"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
-       d="M 672.89569,653.70827 C 639.07134,458.38523 575.66642,267.28798 393.30285,93.184821"
-       id="path4268"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"

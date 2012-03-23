@@ -2613,38 +2613,6 @@ Stream the message into the FLASH
 Generate Always event
 \end_layout
 
-\begin_layout Description
-S8 Write to GPS
-\end_layout
-
-\begin_layout Enumerate
-Send the message string to GPS and append <CR><LF> 
-\end_layout
-
-\begin_layout Enumerate
-Generate Always event
-\end_layout
-
-\begin_layout Description
-S9 Pop message
-\end_layout
-
-\begin_layout Enumerate
-Stream data from FLASH to local memory until and including <LF> 
-\end_layout
-
-\begin_layout Enumerate
-Send message back along USB 
-\end_layout
-
-\begin_layout Enumerate
-Generate Always event
-\end_layout
-
-\begin_layout Standard
-For S8 and S9 they return to S0 or S1 depending on global record boolean.
-\end_layout
-
 \begin_layout Standard
 \begin_inset Float figure
 wide false
