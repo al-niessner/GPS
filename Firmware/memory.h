@@ -155,8 +155,7 @@ typedef union usb_data_packet
 
   struct // GPS_SDC_CONFIG_REQ
   {
-    usb_cmd_t cmd;
-    unsigned char fill;
+    unsigned int  sdc_status;
     unsigned char cid[15];
     unsigned char csd[15];
   };
@@ -164,11 +163,10 @@ typedef union usb_data_packet
   struct // GPS_SDC_STATE_REQ
   {
     usb_cmd_t cmd;
-    unsigned int sdc_status;
     unsigned long int next_page_to_read;
     unsigned long int next_page_to_write;
     unsigned long int total_pages;
-    unsigned char unused[USBGEN_EP_SIZE - 15];
+    unsigned char unused[USBGEN_EP_SIZE - 13];
   };
 
   struct // EEPROM read/write structure

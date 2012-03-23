@@ -42,6 +42,7 @@ void flash (void);
 #pragma udata access fast_access
 static near unsigned int timer_counter;
 static near unsigned int flash_counter;
+static near unsigned int led_rate;
 
 #pragma udata
 
@@ -88,6 +89,7 @@ void main(void)
 
   last = 0u;
   ltc = 0u;
+  led_rate = 0x40;
   main_initialize();
   LED_OFF();
   while (true)
@@ -105,7 +107,7 @@ void main(void)
         }
       else cost = now - last;
 
-      if ((tc & 0x40) == 0x0u) LED_OFF();
+      if ((tc & led_rate) == 0x0u) LED_OFF();
       else LED_ON();
 
       last = now;
@@ -114,7 +116,7 @@ void main(void)
       usb_handle();
 #endif
       fifo_broadcast_state_usb (cost);
-      fsm_process();
+      led_rate = fsm_process();
     }
 }
 

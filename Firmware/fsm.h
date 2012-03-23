@@ -26,6 +26,6 @@
 #include "memory.h"
 
 void fsm_initialize(void);
-void fsm_process (void);
+unsigned int fsm_process (void);
 
 #endif

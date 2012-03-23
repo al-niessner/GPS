@@ -32,4 +32,4 @@ SECTION    NAME=gps_sdcard       RAM=gps2
 SECTION    NAME=gps_usb          RAM=gps3
 SECTION    NAME=usb_stack_ram    RAM=usb2
 
-STACK      SIZE=0x40       RAM=gpr1
+STACK      SIZE=0x60       RAM=gpr1

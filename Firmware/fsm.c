@@ -47,27 +47,13 @@ static usb_shared_block_t usb;
 static bool_t basic;
 static unsigned char duration[2] = {0, 0};
 static unsigned char idx;
-
+static unsigned int rate;
 
 #pragma code
 
-void fsm_adjust (void)
-{
-  if (fsm.required < UNDEFINED)
-    {
-      fsm.current  = fsm.required;
-      fsm.required = UNDEFINED;
-    }
-
-  if (fsm.requested < UNDEFINED && (fsm.next == S0 || fsm.next == S1))
-    {
-      fsm.current   = fsm.requested;
-      fsm.requested = UNDEFINED;
-    }
-}
-
 void fsm_clear(void)
 {
+  rate = 0x40;
   if (duration[0] == 3u && duration[1] == 3u)
     {
       LED_ON();
@@ -131,6 +117,7 @@ void fsm_send(void)
 
 void fsm_track(void)
 {
+  rate = 0x20;
   if (duration[0] == 2u)
     {
       LED_ON();
@@ -172,8 +159,7 @@ void fsm_usb(void)
           break;
 
         case GPS_SDC_CONFIG_REQ:
-          usb.outbound.cmd = GPS_SDC_CONFIG_REQ;
-          usb.outbound.fill = 0;
+          usb.outbound.sdc_status = sdcard_get_status();
           memcpy (usb.outbound.cid, (const void*)sdcard.cid, 15);
           memcpy (usb.outbound.csd, (const void*)sdcard.csd, 15);
           fifo_push_usb (USBGEN_EP_SIZE);
@@ -181,7 +167,6 @@ void fsm_usb(void)
 
         case GPS_SDC_STATE_REQ:
           usb.outbound.cmd = GPS_SDC_STATE_REQ;
-          usb.outbound.sdc_status = sdcard_get_status();
           usb.outbound.next_page_to_read = sdcard.read_page;
           usb.outbound.next_page_to_write = sdcard.write_page;
           usb.outbound.total_pages = sdcard.total_pages;
@@ -198,6 +183,7 @@ void fsm_usb(void)
 
 void fsm_waypt(void)
 {
+  rate = 0x10;
   if (duration[1] == 2u)
     {
       LED_ON();
@@ -209,6 +195,7 @@ void fsm_waypt(void)
 
 void fsm_initialize(void)
 {
+  rate = 0x40;
   fsm.current = S0;
   fsm.next = S0;
   fsm.requested = UNDEFINED;
@@ -218,10 +205,22 @@ void fsm_initialize(void)
   LED_OFF();
 }
 
-void fsm_process (void)
+unsigned int fsm_process (void)
 {
   fsm.current = fsm.next;
-  fsm_adjust();
+
+  if (fsm.required < UNDEFINED)
+    {
+      fsm.current  = fsm.required;
+      fsm.required = UNDEFINED;
+    }
+
+  if (fsm.requested < UNDEFINED && (fsm.current == S0 || fsm.current == S1))
+    {
+      fsm.current   = fsm.requested;
+      fsm.requested = UNDEFINED;
+    }
+
   switch (fsm.current)
     {
     case S0: fsm_idle (false); break;
@@ -241,4 +240,6 @@ void fsm_process (void)
       fsm.next = INDETERMINATE;
       break;
     }
+
+  return rate;
 }
