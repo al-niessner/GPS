@@ -23,8 +23,12 @@
 #ifndef GPS_SERIAL_H
 #define GPS_SERIAL_H
 
-void serial_initializa(void);
-void serial_read (char c);
-void serial_write (char *s);
+#include "memory.h"
+
+void   serial_initialize(void);
+bool_t serial_is_receiving(void);
+char   serial_pop(void);
+void   serial_set_allow (bool_t b);
+void   serial_set_valid (bool_t b);
 
 #endif

@@ -77,11 +77,32 @@ typedef struct sdcard_shared_block
   unsigned long int write_page;
 } sdcard_shared_block_t;
 
+
+/**
+  * Serial
+ **/
+
+typedef struct serial_shared_block
+{
+  unsigned char read_addr;
+  unsigned char write_addr;
+  unsigned char buffer[32];
+} serial_shared_block_t;
+
+
 /**
   * Time Event
 **/
 
 typedef enum { FALLING_EDGE, RISING_EDGE, SS_HIGH, SS_LOW } button_event_t;
+
+typedef struct timing_shared_block
+{
+  unsigned int      counter;
+  unsigned long int button[2];
+  button_event_t    events[2];
+} timing_shared_block_t;
+
 
 /**
   * USB Types

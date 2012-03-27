@@ -20,27 +20,25 @@
  *
  *********************************************************************/
 
-#ifndef GPS_FIFO_H
-#define GPS_FIFO_H
+#include "serial.h"
 
-#include "memory.h"
+#pragam udata overlay access gps_serial
+static near serial_shared_block_t serial;
 
-void   fifo_initialize(void);
-void   fifo_initialize_usb(void);
+#pragma udata
 
-bool_t fifo_fetch_time_event(button_event_t *button); // array of 2
-void   fifo_push_time_event(button_event_t *button); // array of 2
+#pragma code
 
-void   fifo_broadcast_xfer_usb (bool_t isReading,
-                                unsigned char r1,
-                                bool_t isValidCRC);
-void   fifo_broadcast_sdcard_usb (sdcard_init_step_t step,
-                                  unsigned char r1,
-                                  unsigned char ver);
-void   fifo_broadcast_state_usb (unsigned long int timing);
+void   serial_initialize(void)
+{}
 
-unsigned char fifo_fetch_usb(void);
-void          fifo_push_usb (unsigned char len);
-bool_t        fifo_waiting_usb(void); // returns true if there is a message waiting to be processed
+bool_t serial_is_receiving(void)
+{
+  return false;
+}
+
+char   serial_pop(void);
+void   serial_set_allow (bool_t b);
+void   serial_set_valid (bool_t b);
 
 #endif

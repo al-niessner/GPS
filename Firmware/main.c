@@ -27,6 +27,7 @@
 #include "HardwareProfile.h"
 #include "memory.h"
 #include "sdcard.h"
+#include "serial.h"
 #include "usb.h"
 
 /** VECTOR REMAPPING *******************************************/
@@ -40,9 +41,14 @@ void main_lpi(void);
 void flash (void);
 
 #pragma udata access fast_access
-static near unsigned int timer_counter;
 static near unsigned int flash_counter;
 static near unsigned int led_rate;
+
+#pragma udata overlay access gps_serial
+static near serial_shared_block_t serial;
+
+#pragma udata overlay access gps_timing 
+static near timing_shared_block_t timer;
 
 #pragma udata
 
@@ -94,7 +100,7 @@ void main(void)
   LED_OFF();
   while (true)
     {
-      tc = timer_counter;
+      tc = timer.counter;
       now = tc;
       now = now << 16;
       now |= TMR3H;
@@ -154,6 +160,7 @@ void main_initialize(void)
   LED_ON();
   fsm_initialize();
   sdcard_initialize();
+  serial_initialize();
   usb_initialize();
   fifo_initialize();
   
@@ -172,7 +179,7 @@ void main_hpi(void)
       TMR3L = 0x62;
       TMR3H = 0x49;
       PIR2bits.TMR3IF = 0;
-      timer_counter++;
+      timer.counter++;
     }
 }
 
