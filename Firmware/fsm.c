@@ -136,7 +136,7 @@ void fsm_usb(void)
     {
       switch (usb.inbound.cmd)
         {
-        case GPS_REQUEST_CMD:
+        case GPS_REQUEST_CMD: // tested
           if (usb.inbound.force) fsm.required = usb.inbound.new_state;
           else fsm.requested = usb.inbound.new_state;
 
@@ -155,14 +155,14 @@ void fsm_usb(void)
           fifo_push_usb (1);
           break;
 
-        case GPS_SDC_CONFIG_REQ:
+        case GPS_SDC_CONFIG_REQ: // tested
           usb.outbound.sdc_status = sdcard_get_status();
           memcpy (usb.outbound.cid, (const void*)sdcard.cid, 15);
           memcpy (usb.outbound.csd, (const void*)sdcard.csd, 15);
           fifo_push_usb (USBGEN_EP_SIZE);
           break;
 
-        case GPS_SDC_STATE_REQ:
+        case GPS_SDC_STATE_REQ: // tested
           usb.outbound.cmd = GPS_SDC_STATE_REQ;
           usb.outbound.next_page_to_read = sdcard.read_page;
           usb.outbound.next_page_to_write = sdcard.write_page;
@@ -170,7 +170,7 @@ void fsm_usb(void)
           fifo_push_usb (USBGEN_EP_SIZE);
           break;
 
-        case GPS_POP:
+        case GPS_POP: // tested
           if (basic)
             for (idx = 0 ; idx < USBGEN_EP_SIZE ; idx++)
               usb.outbound._byte[idx] = sdcard_read();
@@ -182,7 +182,7 @@ void fsm_usb(void)
           fifo_push_usb (USBGEN_EP_SIZE);
           break;
 
-        case GPS_PUSH:
+        case GPS_PUSH: // tested
           if (basic)
             {
               for (idx = 0 ; idx < usb.inbound.len ; idx++)
@@ -264,7 +264,7 @@ void fsm_process (void)
     case S4: fsm_uart ();      break;
     case S5: fsm_usb  ();      break; // tested
     case S6: fsm_clear();      break; // tested
-    case S7: fsm_push ();      break;
+    case S7: fsm_push ();      break; 
     case S8: fsm_send ();      break;
 
     case UNDEFINED:

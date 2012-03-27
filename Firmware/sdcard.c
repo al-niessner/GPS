@@ -538,6 +538,12 @@ unsigned char sdcard_read (void)
       for (bidx = 0xffff ; bidx && sdcard_get_status() ; bidx--)
         putcSPI(SD_NULL);
       fifo_broadcast_xfer_usb (true, reply.val[0], crc.value == expected.value);
+
+      if (sdcard_get_status() == 0u)
+        {
+          sdcard.read_page++;
+          sdcard_update_mbr();
+        }
     }
 
   SD_CS = 1;
@@ -570,7 +576,6 @@ void sdcard_write (unsigned char c)
           SD_CS = 1;
         }
     }
-  else result = 0xfeu;
 
   if (0u < offset)
     {
