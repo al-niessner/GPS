@@ -103,14 +103,10 @@ void fsm_push(void)
   fsm.next = S1;
 }
 
-void fsm_send(void)
-{
-  // TODO: send a message to the GPS receiver via the serial bus
-  fsm.next = basic ? S0:S1;
-}
-
 void fsm_track(void)
 {
+  fsm.next = S1;
+
   if (duration[0] == 2u)
     {
       LED_ON();
@@ -119,9 +115,8 @@ void fsm_track(void)
           memcpypgm2ram ((void*)&val, (const far rom void*)&new_track[idx], 1);
           sdcard_write (val);
         }
+      fsm.next = S7;
     }
-
-  fsm.next = S1;
 }
 
 void fsm_uart(void)
@@ -214,6 +209,8 @@ void fsm_usb(void)
 
 void fsm_waypt(void)
 {
+  fsm.next = S1;
+
   if (duration[1] == 2u)
     {
       LED_ON();
@@ -223,9 +220,8 @@ void fsm_waypt(void)
                          (const far rom void*)&new_waypoint[idx], 1);
           sdcard_write (val);
         }
+      fsm.next = S7;
     }
-
-  fsm.next = S1;
 }
 
 void fsm_initialize(void)
@@ -265,7 +261,6 @@ void fsm_process (void)
     case S5: fsm_usb  ();      break; // tested
     case S6: fsm_clear();      break; // tested
     case S7: fsm_push ();      break; 
-    case S8: fsm_send ();      break;
 
     case UNDEFINED:
     case INDETERMINATE:

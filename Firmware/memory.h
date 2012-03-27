@@ -36,7 +36,7 @@ typedef enum { false=0==1, true=0==0 } bool_t;
   * somewhere along the way and the FSM is now in a bad state.
  **/
 
-typedef enum { S0=0, S1, S2, S3, S4, S5, S6, S7, S8,
+typedef enum { S0=0, S1, S2, S3, S4, S5, S6, S7,
                UNDEFINED=0xfe, INDETERMINATE=0xff } fsm_state_t;
 
 typedef struct fsm_shared_block
