@@ -70,8 +70,14 @@ typedef enum { SD_POWER_UP=0x00, // device is turned on
 
 typedef struct sdcard_shared_block
 {
+  bool_t isReading;
+  bool_t isValidCRC;
+  sdcard_init_step_t step;
   unsigned char cid[16];
   unsigned char csd[16];
+  unsigned char block_r1;
+  unsigned char last_r1;
+  unsigned char ver;
   unsigned long int read_page;
   unsigned long int total_pages;
   unsigned long int write_page;

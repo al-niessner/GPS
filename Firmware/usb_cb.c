@@ -23,7 +23,7 @@
 #include <USB/usb.h>
 #include <USB/usb_function_generic.h>
 
-#include "fifo.h"
+void initialize_usb(void);
 
 #pragma code
 
@@ -382,7 +382,7 @@ void USBCBSendResume( void )
  */
 void USBCBInitEP (void)
 {
-  fifo_initialize_usb();
+  initialize_usb();
 }
 
 

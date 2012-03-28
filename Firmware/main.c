@@ -22,7 +22,6 @@
 
 #include <Compiler.h>
 
-#include "fifo.h"
 #include "fsm.h"
 #include "HardwareProfile.h"
 #include "memory.h"
@@ -121,7 +120,7 @@ void main(void)
 #if defined (USB_POLLING)
       usb_handle();
 #endif
-      fifo_broadcast_state_usb (cost);
+      usb_broadcast_state (cost);
       fsm_process();
     }
 }
@@ -162,7 +161,6 @@ void main_initialize(void)
   sdcard_initialize();
   serial_initialize();
   usb_initialize();
-  fifo_initialize();
   
   // interrupts are on
   RCONbits.IPEN   = 1; // Enable prioritized interrupts.

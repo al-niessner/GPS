@@ -25,8 +25,12 @@
 
 #include "memory.h"
 
-void   usb_handle(void);
-void   usb_initialize(void);
-bool_t usb_process(void);
+void          usb_broadcast_state (unsigned long int timing);
+unsigned char usb_fetch(void);
+void          usb_handle(void);
+void          usb_initialize(void);
+bool_t        usb_process(void);
+void          usb_push (unsigned char len);
+bool_t        usb_is_waiting(void);
 
 #endif

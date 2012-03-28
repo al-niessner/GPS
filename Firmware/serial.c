@@ -22,7 +22,7 @@
 
 #include "serial.h"
 
-#pragam udata overlay access gps_serial
+#pragma udata overlay access gps_serial
 static near serial_shared_block_t serial;
 
 #pragma udata
@@ -37,8 +37,14 @@ bool_t serial_is_receiving(void)
   return false;
 }
 
-char   serial_pop(void);
-void   serial_set_allow (bool_t b);
-void   serial_set_valid (bool_t b);
+char   serial_pop(void)
+{
+  return 0;
+}
 
-#endif
+void   serial_set_allow (bool_t b)
+{}
+
+void   serial_set_valid (bool_t b)
+{}
+

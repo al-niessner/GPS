@@ -22,10 +22,10 @@
 
 #include <Compiler.h>
 
-#include "fifo.h"
 #include "fsm.h"
 #include "HardwareProfile.h"
 #include "sdcard.h"
+#include "serial.h"
 #include "usb.h"
 
 #define MSG_SIZE 0x0fu
@@ -57,8 +57,8 @@ void fsm_clear(void)
   if (duration[0] == 3u && duration[1] == 3u)
     {
       LED_ON();
-      fifo_set_allow (false);
-      fifo_set_valid (false);
+      serial_set_allow (false);
+      serial_set_valid (false);
       sdcard_erase();
     }
 
@@ -72,11 +72,11 @@ void fsm_idle (bool_t full)
 
   fsm.next = full ? S1:S0;
   basic = !full;
-  fifo_set_allow (full);
+  serial_set_allow (full);
 
-  if      (fifo_waiting_usb())  fsm.next = S5;
-  else if (fifo_is_receiving()) fsm.next = full ? S4:S0;
-  else if (fifo_fetch_time_event (be))
+  if      (usb_is_waiting())  fsm.next = S5;
+  else if (serial_is_receiving()) fsm.next = full ? S4:S0;
+  else if (false) // time event check goes here
     {
       // update duration or generate events if duration is surpassed
       if (be[0] == RISING_EDGE || be[0] == SS_HIGH) duration[0]++;
@@ -99,7 +99,7 @@ void fsm_idle (bool_t full)
 
 void fsm_push(void)
 {
-  fifo_set_valid (false);
+  serial_set_valid (false);
   fsm.next = S1;
 }
 
@@ -121,8 +121,8 @@ void fsm_track(void)
 
 void fsm_uart(void)
 {
-  fifo_set_valid (true);
-  fsm.next = fifo_is_receiving() ? S4:S7;
+  serial_set_valid (true);
+  fsm.next = serial_is_receiving() ? S4:S7;
 }
 
 void fsm_usb(void)
@@ -147,14 +147,14 @@ void fsm_usb(void)
               duration[1] = usb.inbound.duration;
             }
           usb.outbound.cmd = GPS_REQUEST_CMD;
-          fifo_push_usb (1);
+          usb_push (1);
           break;
 
         case GPS_SDC_CONFIG_REQ: // tested
           usb.outbound.sdc_status = sdcard_get_status();
           memcpy (usb.outbound.cid, (const void*)sdcard.cid, 15);
           memcpy (usb.outbound.csd, (const void*)sdcard.csd, 15);
-          fifo_push_usb (USBGEN_EP_SIZE);
+          usb_push (USBGEN_EP_SIZE);
           break;
 
         case GPS_SDC_STATE_REQ: // tested
@@ -162,7 +162,7 @@ void fsm_usb(void)
           usb.outbound.next_page_to_read = sdcard.read_page;
           usb.outbound.next_page_to_write = sdcard.write_page;
           usb.outbound.total_pages = sdcard.total_pages;
-          fifo_push_usb (USBGEN_EP_SIZE);
+          usb_push (USBGEN_EP_SIZE);
           break;
 
         case GPS_POP: // tested
@@ -174,7 +174,7 @@ void fsm_usb(void)
                            (const far rom void*)pop_err_msg,
                            POP_ERR + 1);
 
-          fifo_push_usb (USBGEN_EP_SIZE);
+          usb_push (USBGEN_EP_SIZE);
           break;
 
         case GPS_PUSH: // tested
@@ -193,7 +193,7 @@ void fsm_usb(void)
             }
 
           usb.outbound.cmd = GPS_PUSH;
-          fifo_push_usb (usb.outbound.len + 2);
+          usb_push (usb.outbound.len + 2);
           break;
 
         case GPS_SEND:
@@ -264,7 +264,7 @@ void fsm_process (void)
 
     case UNDEFINED:
     case INDETERMINATE:
-      if (fifo_waiting_usb()) fsm_usb(); // keep the USB alive
+      if (usb_is_waiting()) fsm_usb(); // keep the USB alive
       fsm.next = INDETERMINATE;
       break;
     }
