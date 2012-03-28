@@ -104,9 +104,9 @@ typedef enum { FALLING_EDGE, RISING_EDGE, SS_HIGH, SS_LOW } button_event_t;
 
 typedef struct timing_shared_block
 {
-  unsigned int      counter;
+  button_event_t    event[2];
   unsigned long int button[2];
-  button_event_t    events[2];
+  unsigned int      counter;
 } timing_shared_block_t;
 
 

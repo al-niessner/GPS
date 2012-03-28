@@ -41,6 +41,9 @@ static fsm_shared_block_t fsm;
 #pragma udata overlay gps_sdcard
 static sdcard_shared_block_t sdcard;
 
+#pragma udata overlay access gps_timing 
+static near timing_shared_block_t timer;
+
 #pragma udata overlay gps_usb
 static usb_shared_block_t usb;
 
@@ -68,7 +71,6 @@ void fsm_clear(void)
 void fsm_idle (bool_t full)
 {
   static bool_t two_button_action;
-  static button_event_t be[2];
 
   fsm.next = full ? S1:S0;
   basic = !full;
@@ -79,18 +81,28 @@ void fsm_idle (bool_t full)
   else if (false) // time event check goes here
     {
       // update duration or generate events if duration is surpassed
-      if (be[0] == RISING_EDGE || be[0] == SS_HIGH) duration[0]++;
-      if (be[0] == SS_LOW)                          duration[0] = 0;
-      if (be[1] == RISING_EDGE || be[1] == SS_HIGH) duration[1]++;
-      if (be[1] == SS_LOW)                          duration[1] = 0;
+      if (timer.event[0] == RISING_EDGE || timer.event[0] == SS_HIGH)
+        duration[0]++;
+      if (timer.event[0] == SS_LOW)
+        duration[0] = 0;
+      if (timer.event[1] == RISING_EDGE || timer.event[1] == SS_HIGH)
+        duration[1]++;
+      if (timer.event[1] == SS_LOW)
+        duration[1] = 0;
 
-      two_button_action = (be[0] == be[1]) && (duration[1] - duration[0]) == 0u;
+      two_button_action = (timer.event[0] == timer.event[1]) &&
+                          (duration[1] - duration[0]) == 0u;
 
-      if (two_button_action) fsm.next = S6;
+      if (two_button_action)
+        {
+          fsm.next = S6;
+          timer.event[0] = SS_HIGH;
+          timer.event[1] = SS_HIGH;
+        }
       else // one button action
         {
-          if (be[0] == SS_HIGH) fsm.next = S2;
-          if (be[1] == SS_HIGH) fsm.next = S3;
+          if (timer.event[0] == SS_HIGH) fsm.next = S2;
+          if (timer.event[1] == SS_HIGH) fsm.next = S3;
         }
 
       if (duration[0] == 0u && duration[1] == 0u) LED_OFF();

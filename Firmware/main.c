@@ -40,8 +40,9 @@ void main_lpi(void);
 void flash (void);
 
 #pragma udata access fast_access
-static near unsigned int flash_counter;
-static near unsigned int led_rate;
+static near unsigned char count[2], idx;
+static near unsigned int  flash_counter;
+static near unsigned int  led_rate;
 
 #pragma udata overlay access gps_serial
 static near serial_shared_block_t serial;
@@ -117,9 +118,25 @@ void main(void)
 
       last = now;
       ltc = tc;
+      count[0] = count[1] = 0;
+      for (idx = 0x0 ; idx < 0x20u ; idx--)
+        {
+          count[0] += (timer.button[0] >> idx) & 0x1;
+          count[1] += (timer.button[1] >> idx) & 0x1;
+        }
+
+      if (24u < count[0] || (20u < count[0] && 24u < count[1]))
+        timer.event[0] = timer.event[0] == SS_LOW ? RISING_EDGE:timer.event[0];
+      else timer.event[0] = SS_LOW;
+
+      if (24u < count[1] || (20u < count[1] && 24u < count[0]))
+        timer.event[1] = timer.event[1] == SS_LOW ? RISING_EDGE:timer.event[1];
+      else timer.event[1] = SS_LOW;
+
 #if defined (USB_POLLING)
       usb_handle();
 #endif
+
       usb_broadcast_state (cost);
       fsm_process();
     }
@@ -178,6 +195,12 @@ void main_hpi(void)
       TMR3H = 0x49;
       PIR2bits.TMR3IF = 0;
       timer.counter++;
+
+      if (timer.counter & 0x1)
+        {
+          timer.button[0] = (timer.button[0] << 1) | 0;
+          timer.button[1] = (timer.button[1] << 1) | 0;
+        }
     }
 }
 
