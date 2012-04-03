@@ -29,10 +29,10 @@
 
 #include "memory.h"
 
-void          sdcard_complete_block(void);
 void          sdcard_erase(void);
 unsigned int  sdcard_get_status(void);
 void          sdcard_initialize(void);
 unsigned char sdcard_read(void);
 void          sdcard_write (unsigned char c);
+
 #endif
