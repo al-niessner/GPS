@@ -95,6 +95,12 @@ typedef struct serial_shared_block
   unsigned char buffer[32];
 } serial_shared_block_t;
 
+typedef struct serial_tx_shared_block
+{
+  unsigned char idx, nidx;
+  unsigned char len, nlen;
+  unsigned char buffer[60];
+} serial_tx_shared_block_t;
 
 /**
   * Time Event

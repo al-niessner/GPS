@@ -117,7 +117,7 @@ class MainDisplay(wx.Frame):
         return
     
     def update (self, data):
-        data = self.__unit.convert (data, self.__model.get_units())
+        # TODO: data = self.__units.convert (data, self.__model.get_units())
         e = gps.gui.NewDataEvent (winid=self.__status.Id, data=data)
         wx.PostEvent (self.__config.GetEventHandler(), e)
         wx.PostEvent (self.__status.GetEventHandler(), e)

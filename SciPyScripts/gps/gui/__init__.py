@@ -2,6 +2,7 @@
 from main  import MainDisplay
 from model import ActionModel
 from model import ConfigurationModel
+from model import UnitModel
 from model import ViewModel
 
 import wx

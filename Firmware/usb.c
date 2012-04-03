@@ -38,6 +38,13 @@ static const far rom usb_device_info_t usb_dev_info =
     0x00               // Checksum (filled in later).
   };
 
+#pragma udata access fast_access
+static near bool_t        ready;
+static near bool_t        do_more;
+static near unsigned char len;
+static near unsigned char usb_in_idx;
+static near unsigned char usb_out_idx;
+
 #pragma udata overlay gps_fsm
 static fsm_shared_block_t fsm;
 
@@ -54,10 +61,6 @@ static usb_data_packet_t usb_in[2];  // buffers for rcving packets to host
 #pragma udata
 static USB_HANDLE usb_in_h[2];   // endpoint handles rcving packets
 static USB_HANDLE usb_out_h[2]; // endpoint handles sending packets
-static unsigned char usb_in_idx;
-static unsigned char usb_out_idx;
-
-static bool_t ready;
 
 #pragma code
 
@@ -151,8 +154,6 @@ void usb_initialize(void)
 
 bool_t usb_process (void)
 {
-  static bool_t do_more;
-  static unsigned char len;
   do_more = false;
 
   if (0u < usb_fetch())

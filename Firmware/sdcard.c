@@ -128,17 +128,19 @@ typedef union
 } sd_mbr_t;
 
 
+#pragma udata access fast_access
+static near sd_crc16_t   crc, expected;
+static near unsigned int bidx, offset;
+
 #pragma udata overlay gps_sdcard
 static sdcard_shared_block_t sdcard;
 
 #pragma udata
 
 static sd_command_t      cmd;
-static sd_crc16_t        crc, expected;
 static sd_mbr_t          mbr;
 static sd_response_t     reply;
 static unsigned char     version;
-static unsigned int      bidx, offset;
 static unsigned long int arg;
 
 

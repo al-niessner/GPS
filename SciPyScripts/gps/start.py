@@ -4,6 +4,7 @@ from device import Serial
 from device import Simulator
 from gui import ConfigurationModel
 from gui import MainDisplay
+from gui import UnitModel
 from gui import ViewModel
 from util import Bus
 
@@ -94,6 +95,7 @@ def execute (config, compass, map, status):
     ml = logging.getLogger ("gps.gui.model")
     models = {
         'config':ConfigurationModel(busses['fromConfig'], config, ml),
+        'unit':UnitModel(),
         'view':ViewModel(busses['fromHardware'], ml),
         }
     __makeThread (models['view'].run, "GUI View Model")

@@ -41,6 +41,9 @@ static fsm_shared_block_t fsm;
 #pragma udata overlay gps_sdcard
 static sdcard_shared_block_t sdcard;
 
+#pragma udata overlay gps_serial_tx
+static serial_tx_shared_block_t transmit;
+
 #pragma udata overlay access gps_timing 
 static near timing_shared_block_t timer;
 
@@ -134,7 +137,10 @@ void fsm_track(void)
 void fsm_uart(void)
 {
   serial_set_valid (true);
-  fsm.next = serial_is_receiving() ? S4:S7;
+  val = serial_pop();
+  fsm.next = (val == '\n') ? S7:S4;
+
+  if (val) sdcard_write (val);
 }
 
 void fsm_usb(void)
@@ -209,6 +215,12 @@ void fsm_usb(void)
           break;
 
         case GPS_SEND:
+          idx = serial_send_offset();
+          memcpy (&transmit.buffer[idx],
+                  (const void*)&usb.inbound.data_block[0],
+                  usb.inbound.len);
+          usb.outbound.cmd = GPS_SEND;
+          usb.outbound.len = serial_send (idx, usb.inbound.len);
           break;
 
         default:

@@ -5,7 +5,6 @@ though it was from the hardware itself. It does not emulate timing, but it
 does allow for full functionality testing.
 """
 import gps.nmea
-import serial
 import threading
 import time
 

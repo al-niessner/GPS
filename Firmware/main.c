@@ -47,6 +47,9 @@ static near unsigned int  led_rate;
 #pragma udata overlay access gps_serial
 static near serial_shared_block_t serial;
 
+#pragma udata overlay gps_serial_tx
+static serial_tx_shared_block_t transmit;
+
 #pragma udata overlay access gps_timing 
 static near timing_shared_block_t timer;
 
@@ -201,6 +204,31 @@ void main_hpi(void)
           timer.button[0] = (timer.button[0] << 1) | 0;
           timer.button[1] = (timer.button[1] << 1) | 0;
         }
+    }
+
+  if (PIR1bits.RCIF)
+    {
+      serial.buffer[serial.write_addr] = RCREG;
+      serial.write_addr = (serial.write_addr + 1) & 0x1f;
+      PIR1bits.RCIF = 0;
+    }
+
+  if (PIR1bits.TXIF)
+    {
+      if (transmit.idx == transmit.len)
+        {
+          transmit.idx = transmit.nidx;
+          transmit.len = transmit.nlen;
+          transmit.nidx = transmit.nlen = 0;
+        }
+
+      TXREG = transmit.buffer[transmit.idx];
+      transmit.idx++;
+
+      if (transmit.idx  == transmit.len &&
+          transmit.nidx == transmit.nidx) PIE1bits.TXIE = 0;
+
+      PIR1bits.TXIF = 0;
     }
 }
 
