@@ -44,6 +44,17 @@
 #define LATCH_ASM( P, B )   LAT ## P ##, B, ACCESS
 
 
+/** LED **************************************************************/
+#define MON_PORT        C
+#define MON_BIT         0
+#define MON_MASK        ( 1 << MON_BIT )
+#define MON_TRIS        TRIS( C, 0 )
+#define MON             LATCH( C, 0 )
+#define MON_ASM         PORT_ASM( C, 0 )
+#define MON_OFF()       MON = 0
+#define MON_TOGGLE()    MON = !MON
+#define INIT_MON()      MON_OFF(), MON_TRIS = OUTPUT_PIN
+
 /** General-purpose digital I/O 0 pin control ************************/
 #define GPIO0_PORT      C
 #define GPIO0_BIT       0

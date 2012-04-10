@@ -31,6 +31,5 @@ unsigned char serial_pop(void);
 bool_t        serial_send (unsigned char offset, unsigned char len);
 unsigned char serial_send_offset(void);
 void          serial_set_allow (bool_t b);
-void          serial_set_valid (bool_t b);
 
 #endif

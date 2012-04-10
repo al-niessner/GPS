@@ -27,14 +27,14 @@
 #include "serial.h"
 
 #pragma udata overlay access gps_serial
-static near serial_shared_block_t serial;
+static volatile near serial_shared_block_t serial;
 
 #pragma udata overlay gps_serial_tx
-static serial_tx_shared_block_t transmit;
+static volatile serial_tx_shared_block_t transmit;
 
 #pragma udata
-static bool_t        active, receiving, valid;
-static unsigned char idx, wa;
+static bool_t        active, receiving, sent;
+static unsigned char idx, val, wa;
 
 #pragma code
 
@@ -42,9 +42,11 @@ void serial_initialize(void)
 {
   active = false;
   receiving = false;
-  valid = false;
   serial.read_addr  = 0x0;
   serial.write_addr = 0x0;
+  transmit.nidx = transmit.idx = 0;
+  transmit.nlen = transmit.len = 0;
+  for (idx = 0x0 ; idx < 0x20u ; idx++) serial.buffer[idx] = '\n';
 
   INIT_RX();
   IPR1bits.RCIP  = 1; // Make RX overflow a high-priority interrupt.
@@ -68,17 +70,17 @@ bool_t serial_is_receiving(void)
     {
       wa = serial.write_addr;
       
-      if (!receiving && (serial.read_addr != wa))
+      if (!receiving)
         {
-          while (serial.buffer[serial.read_addr] != '$' &&
-                 serial.read_addr != wa)
+          while ((serial.buffer[serial.read_addr] != '$') &&
+                 (serial.read_addr != wa))
             serial.read_addr = (serial.read_addr + 1) & 0x1f;
           receiving = serial.buffer[serial.read_addr] == '$';
 
           if (serial.read_addr < wa)
-            receiving &= (wa - serial.read_addr < 29u);
+            receiving &= (wa - serial.read_addr < 23u);
           if (wa < serial.read_addr)
-            receiving &= ((wa + 0x20) - serial.read_addr < 29u);
+            receiving &= ((wa | 0x20) - serial.read_addr < 23u);
         }
     }
   else receiving = false;
@@ -88,11 +90,12 @@ bool_t serial_is_receiving(void)
 
 unsigned char serial_pop(void)
 {
-  unsigned char val = 0;
+  val = 0;
 
   if (serial.read_addr != serial.write_addr)
     {
       val = serial.buffer[serial.read_addr];
+      serial.buffer[serial.read_addr] = '\n';
       serial.read_addr = (serial.read_addr + 1) & 0x1f;
       receiving = val != '\n';
     }
@@ -102,20 +105,19 @@ unsigned char serial_pop(void)
 
 bool_t serial_send (unsigned char offset, unsigned char len)
 {
-  bool_t result = false;
-
+  sent = false;
   for (idx = 0xff ; idx && transmit.nidx != transmit.nlen ; idx--)
     Delay100TCYx (1);
 
   if (transmit.nidx == transmit.nlen)
     {
-      result = true;
+      sent = true;
       transmit.nidx = offset;
       transmit.nlen = offset + len;
       PIE1bits.TXIE = 1;
     }
 
-  return result;
+  return sent;
 }
 
 unsigned char serial_send_offset(void)
@@ -128,8 +130,4 @@ void serial_set_allow (bool_t b)
   active = b;
 }
 
-void serial_set_valid (bool_t b)
-{
-  valid = b;
-}
 

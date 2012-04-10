@@ -64,7 +64,6 @@ void fsm_clear(void)
     {
       LED_ON();
       serial_set_allow (false);
-      serial_set_valid (false);
       sdcard_erase();
     }
 
@@ -114,7 +113,6 @@ void fsm_idle (bool_t full)
 
 void fsm_push(void)
 {
-  serial_set_valid (false);
   fsm.next = S1;
 }
 
@@ -136,11 +134,13 @@ void fsm_track(void)
 
 void fsm_uart(void)
 {
-  serial_set_valid (true);
-  val = serial_pop();
-  fsm.next = (val == '\n') ? S7:S4;
+  do 
+    {
+      val = serial_pop();
 
-  if (val) sdcard_write (val);
+      if (val) sdcard_write (val);
+    } while (val != 0u && val != '\n');
+  fsm.next = (val == '\n') ? S7:S4;
 }
 
 void fsm_usb(void)

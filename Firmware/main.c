@@ -45,13 +45,13 @@ static near unsigned int  flash_counter;
 static near unsigned int  led_rate;
 
 #pragma udata overlay access gps_serial
-static near serial_shared_block_t serial;
+static volatile near serial_shared_block_t serial;
 
 #pragma udata overlay gps_serial_tx
-static serial_tx_shared_block_t transmit;
+static volatile serial_tx_shared_block_t transmit;
 
 #pragma udata overlay access gps_timing 
-static near timing_shared_block_t timer;
+static volatile near timing_shared_block_t timer;
 
 #pragma udata
 
@@ -119,6 +119,7 @@ void main(void)
       if ((tc & led_rate) == 0x0u) LED_OFF();
       else LED_ON();
 
+      MON_TOGGLE();
       last = now;
       ltc = tc;
       count[0] = count[1] = 0;
@@ -159,7 +160,8 @@ void main_initialize(void)
   ANSELH = 0;
 
   // Initialize the I/O pins.
-  INIT_GPIO0();
+  //INIT_GPIO0();
+  INIT_MON();
   INIT_GPIO1();
   INIT_GPIO2();
   INIT_GPIO3();
